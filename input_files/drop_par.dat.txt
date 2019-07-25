@@ -1,0 +1,102 @@
+##  **DEFINIZIONE DELLA PROVA    :
+#
+# NUMERO SEQUENZIALE DELLA PROVA ======>.... droppa2
+#
+# ** PROPRIETA' MOLECOLARI
+#
+# MASSA MOLECOLARE LIQUIDO ============>.... 0.1000e01
+# DIAMETRO MOLECOLARE LIQUIDO =========>.... 0.1000e01
+# Tipo di potenziale gas-gas          =>.... p
+# Campo medio gas-gas yes or no       =>.... y
+# PARAMETRO POTENZIALE PHI11 ==========>.... 0.1000e01
+# ESPONENTE POTENZIALE PHI11 ==========>.... 0.6000e01
+# Numero punti per spline pot gas-gas =>....     1200
+# MASSA MOLECOLARE SOLIDO =============>.... 0.2000e01
+# DIAMETRO MOLECOLARE SOLIDO ==========>.... 0.1000e01
+# Tipo di potenziale gas-solido       =>.... e
+# Campo medio gas-wall yes or no      =>.... y
+# PARAMETRO POTENZIALE PHI12 ==========>.... 0.1500e01
+# ESPONENTE POTENZIALE PHI12 ==========>.... 0.5405e01
+# Numero punti per spline pot gas-sol =>....     1200
+#
+# ** STATO FISICO DELLE PARETI          :
+#
+# Temp. iniziale liquido ==============>.... 0.5000e00
+# Temp. iniziale liquido ==============>.... 0.5000e00
+# DENSITA' DELLA PARETE per campo medio>.... 0.7000e00
+# DENSITA' DELLA PARETE per correlazio >.... 0.7000e00
+# DENSITA' DEL GAS     ================>.... 0.6490e-02
+# DENSITA' DEL LIQUIDO ================>.... 0.3763e00
+# Presenza di strato liquido iniziale==>....       13
+# spessore strato liquido iniziale x ==>.... 0.1800e02
+# spessore strato liquido iniziale y ==>.... 0.0000e00
+# Raggio goccia iniziale liquida     ==>.... 0.3000e02
+# Offset goccia liquida iniziale     ==>.... 0.1400e02
+# Number of iterations for thermostat =>....      50
+# Reference temperature for thermostat=>.... 0.5000e00
+# Keep baricentre fixed (1) or not (0)=>....        0
+# Natura del Bordo x1, parete o libero =>... h
+# Natura del Bordo x2, parete o libero =>... h
+# Natura del Bordo y1, parete o libero =>... w
+# Natura del Bordo y2, parete o libero =>... m
+# Sets(1),ignores(0) periodicity in mean f x        1
+# Sets(1),ignores(0) periodicity in mean f y        0
+# Sets(1),ignores(0) periodicity in avdens.x        1
+# Sets(1),ignores(0) periodicity in avdens.y        0
+# TEMPERATURA PARETE X1 ===============>.... 0.5000e00
+# TEMPERATURA PARETE X2 ===============>.... 0.5000e00
+# TEMPERATURA PARETE Y1 ===============>.... 0.5000e00
+# TEMPERATURA PARETE Y2 ===============>.... 0.5000e00
+# Fattore flusso parete x1  ===========>.... 0.1000e01
+# Fattore flusso parete x2  ===========>.... 0.1000e01
+# Fattore flusso parete y1  ===========>.... 0.1000e01
+# Fattore flusso parete y2  ===========>.... 0.1000e01
+# Probabilita perdita parete x1 =======>.... 0.0000e00
+# Probabilita perdita parete x2 =======>.... 0.0000e00
+# Probabilita perdita parete y1 =======>.... 0.0000e00
+# Probabilita perdita parete y2 =======>.... 0.5000e00
+# VELOCITA' PARETI  1 X ===============>.... 0.0000e00
+# VELOCITA' PARETI  1 Y ===============>.... 0.0000e00
+# VELOCITA' PARETI  2 X ===============>.... 0.0000e00
+# VELOCITA' PARETI  2 Y ===============>.... 0.0000e00
+# VELOCITA' PARETI  3 X ===============>.... 0.0000e00
+# VELOCITA' PARETI  3 Y ===============>.... 0.0000e00
+# VELOCITA' PARETI  4 X ===============>.... 0.0000e00
+# VELOCITA' PARETI  4 Y ===============>.... 0.0000e00
+# SEMI-DISTANZA PARETI X1 =============>.... 0.2500e02
+# SEMI-DISTANZA PARETI X2 =============>.... 0.2500e02
+# SEMI-DISTANZA PARETI Y1 =============>.... 0.2500e02
+# SEMI-DISTANZA PARETI Y2 =============>.... 0.2900e02
+# INTENSITA' CAMPO ESTERNO(POISEUILLE)=>.... 0.0000e00
+#
+# ** PARAMETRI COMPUTAZIONALI
+#
+# XMIN ================================>.... 0.3500e02
+# XMAX ================================>.... 0.3500e02
+# YMIN ================================>.... 0.2900e02
+# YMAX ================================>.... 0.2900e02
+# XEXTRA (TRONCAMENTO CAMPO MEDIO)=====>     0.2500e01
+# YEXTRA (TRONCAMENTO CAMPO MEDIO)=====>     0.2500e01
+# NUMERO CELLE DIR. X =================>....      700
+# NUMERO CELLE DIR. Y =================>....      580
+# NUMERO PARTICELLE LIQUIDO ===========>....  3000000
+# mean_vel=0 (0) or /=0 (1)  ==========>            1
+# Restart 0 no 1 yes 2 yes mirror  ====>            0
+# vx_ini ==============================>     0.0000e00
+# vy_ini ==============================>     -0.600e00
+# vz_ini ==============================>     0.0000e00
+# TINI ================================>     0.0000e02
+# TMAX ================================>     1.0000e03
+# TIM =================================>     2.0000e02
+# Numero intervalli tra tim e tmax ====>           1
+# Partenza del contatore per intervalli>           0
+# DELTAT ==============================>     0.5000e-02
+# Qwrite                                            0
+# SEME  ===============================>           76
+# NUMERO NODI VELOCITA' FUNZ. DISTR. ==>          100
+# Routine to compute collisions choice=>     2
+# Split type for parallel collisions  =>     1
+# Choice for build_I_matrix routine   =>     o
+# Collision statistics off (0) on (1) =>     0
+# Number of subdomains for statistics =>     6
+# **************************** FINE INPUT *************************************
