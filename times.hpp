@@ -24,7 +24,7 @@ public:
     tc(nc_out+1, 0.0)
     {
       for (int i=0; i<nc_out+1; i++)
-        tc[i] = t_im + (t_max - t_im) * (double)i / (double)nc_out;
+        tc[i] = t_im + (t_max - t_im) * (real_number)i / (real_number)nc_out;
     }
 
   ~Times() = default;
@@ -35,7 +35,7 @@ public:
   const real_number get_t_ini(void) const { return t_ini; }
   const real_number get_t_max(void) const { return t_max; }
   const real_number get_t_im(void) const { return t_im; }
-  
+
   const real_number& get_delta_t(void) const { return delta_t; }
 
   const real_number get_tc(int i) const { return tc[i]; }

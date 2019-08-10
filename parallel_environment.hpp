@@ -6,17 +6,11 @@
 #include "motherbase.hpp"
 #include "types.hpp"
 
-#ifndef RANK_RNG_OFFSET
 #define RANK_RNG_OFFSET 1000
-#endif
 
-#ifndef MPI_MASTER
 #define MPI_MASTER 0
-#endif
 
-#ifndef MPI_NO_RANK
 #define MPI_NO_RANK -1
-#endif
 
 class DSMC;
 
@@ -24,7 +18,7 @@ class ParallelEnvironment : protected Motherbase
 {
 
 private:
-  
+
   MPI_Comm communicator;
   bool initialized;
   int rank;

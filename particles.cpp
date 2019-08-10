@@ -52,22 +52,13 @@ Ensemble::populate
   par_env->barrier();
   exchange_particles();
 
-  // DEBUG
-  // # # # # #
-  for (int i = 0; i<n_particles; ++i)
-  {
-    assert(particles[i].r_tag==par_env->get_rank() && "A particle is outside its process");
-    assert(particles[i].r_tag==topology->tag_subdom(particles[i].cell_x, particles[i].cell_y) && "A particle is outside its domain");
-  }
-  // # # # # #
-
 }
 
 void
 Ensemble::exchange_particles
 (void)
 {
-
+  
   fill_inc_matrix();
 
     for ( int i = 0; i<n_subdom; ++i )
@@ -81,7 +72,7 @@ Ensemble::exchange_particles
           if ( i!=j && inc_matrix[i*n_subdom+j]>0 )
           {
             /* USE A SEND VERSION FROM PAR. ENV. !!! -> MPI_PARTICLE_TYPE should be in parallel_environment.hpp */
-            MPI_Send ( temp_send_map[j].data(), temp_send_map[j].size(), MPI_PARTICLE_TYPE, j, 0, MPI_COMM_WORLD);
+            MPI_Send ( temp_send_map[j].data(), temp_send_map[j].size(), MPI_PARTICLE_TYPE, j, 0, MPI_COMM_WORLD );
           }
         }
       }
@@ -92,7 +83,7 @@ Ensemble::exchange_particles
         {
           /* USE A RECV VERSION FROM PAR. ENV. !!! -> MPI_PARTICLE_TYPE should be in parallel_environment.hpp */
           MPI_Recv ( &(temp_send_map[domain_rank][idx_r]), inc_matrix[i*n_subdom+domain_rank],
-            MPI_PARTICLE_TYPE, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_PARTICLE_TYPE, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE );
           idx_r += inc_matrix[i*n_subdom+domain_rank];
         }
       }
@@ -118,8 +109,12 @@ Ensemble::fill_inc_matrix
     dep_particles += inc_matrix[i];
   for ( int i = domain_rank; i<par_env->get_size2(); i+=n_subdom )
     inc_particles += inc_matrix[i];
+  // DEBUG
+  // # # # # #
   assert( n_particles+inc_particles-dep_particles>=0 && "Can't balance in/out particles" );
   assert( dep_particles>=0 && "Negative outflow of departing particles" );
+  assert( inc_particles>=0 && "Negative inflow of departing particles" );
+  // # # # # #
   temp_send_map[domain_rank].resize(n_particles+inc_particles-dep_particles);
   idx_r = n_particles - dep_particles;
 

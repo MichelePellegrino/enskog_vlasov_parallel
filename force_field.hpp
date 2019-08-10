@@ -38,6 +38,8 @@ private:
   NumericalIntegrator<Infinite> infinite_integrator;
 
   ev_matrix::SlideMaskMatrix<real_number> kernel_matrix;
+  ev_matrix::SlideMaskMatrix<real_number> kernel_matrix_x;
+  ev_matrix::SlideMaskMatrix<real_number> kernel_matrix_y;
 
   void compute_kernel_matrix (void);
   real_number compute_integral (void);

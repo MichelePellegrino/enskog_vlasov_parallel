@@ -31,6 +31,7 @@ protected:
   DefaultPointer<DensityKernel>& density;
   DefaultPointer<NondirectionalPairPotential>& potential;
   DefaultPointer<ForceField>& mean_field;
+  DefaultPointer<TimeMarching<TM>>& time_marching;
   DefaultPointer<CollisionHandler>& collision_handler;
 
   CorrelationFun& correlation;
@@ -60,9 +61,10 @@ public:
     density           (dsmc->get_density()),
     potential         (dsmc->get_potential()),
     mean_field        (dsmc->get_mean_field()),
+    time_marching     (dsmc->get_time_marching()),
     collision_handler (dsmc->get_collision_handler()),
 
-    correlation (dsmc->get_correlation())
+    correlation       (dsmc->get_correlation())
 
     { }
 

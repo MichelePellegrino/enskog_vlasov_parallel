@@ -19,6 +19,8 @@ class DensityKernel;
 class ForceField;
 class CollisionHandler;
 
+template<MarchingType tm_type> class TimeMarching;
+
 class DSMC
 {
 
@@ -45,6 +47,7 @@ private:
   DefaultPointer<DensityKernel> density;
   DefaultPointer<NondirectionalPairPotential> potential;
   DefaultPointer<ForceField> mean_field;
+  DefaultPointer<TimeMarching<TM>> time_marching;
   DefaultPointer<CollisionHandler> collision_handler;
 
   CorrelationFun correlation;
@@ -68,6 +71,7 @@ public:
   inline DefaultPointer<DensityKernel>& get_density() { return density; }
   inline DefaultPointer<NondirectionalPairPotential>& get_potential() { return potential; }
   inline DefaultPointer<ForceField>& get_mean_field() { return mean_field; }
+  inline DefaultPointer<TimeMarching<TM>>& get_time_marching() { return time_marching; }
   inline DefaultPointer<CollisionHandler>& get_collision_handler() { return collision_handler; }
   inline CorrelationFun& get_correlation() { return correlation; }
 

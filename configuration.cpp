@@ -29,6 +29,7 @@ ConfigurationReader::read_conf_file
   DefaultString line_buffer;
 
   std::cout << "### READING CONFIGURATION PARAMETERS ###" << std::endl;
+  std::cout << " >> Configuration file: " << conf_file_name << std::endl;
 
   getline (fs, line_buffer);                // ##  **DEFINIZIONE DELLA PROVA
   getline (fs, line_buffer);                // #

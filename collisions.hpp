@@ -3,25 +3,50 @@
 
 #include "motherbase.hpp"
 #include "matrix.hpp"
+#include "topology.hpp"
 
 #include <valarray>
 #include <cmath>
 #include <algorithm>
 #include <vector>
 #include <array>
+#include <map>
 
-#ifndef TEST_COEFF_MULT
 #define TEST_COEFF_MULT 5
-#endif
 
-#ifndef N_COLLISION_SUBDOM
-#define N_COLLISION_SUBDOM 4
-#endif
+struct VelocityType
+{
+  real_number vx, vy, vz;
+  VelocityType() = default;
+  VelocityType(real_number _vx_, real_number _vy_, real_number _vz_):
+    vx(_vx_), vy(_vy_), vz(_vz_) { }
+  ~VelocityType() = default;
+};
+
+struct CollisionCounter
+{
+  int total, real, fake, out_bound;
+  CollisionCounter() = default;
+  CollisionCounter(int tt, int tr, int fl, int fk):
+    total(tt), real(tr), fake(fl), out_bound(fk) { }
+  ~CollisionCounter() = default;
+};
 
 class CollisionHandler : protected Motherbase
 {
 
 private:
+
+  template <class data_type>
+  using process_map = std::map< int, std::vector< data_type > >;
+
+  // Parallel env
+  const int size, rank;
+
+  // Global number of collisions
+  int n_fake = 0;
+  int n_real = 0;
+  int n_total = 0;
 
   std::array<int, N_COLLISION_SUBDOM> subdom_order;
 
@@ -34,6 +59,16 @@ private:
   ev_matrix::MaskMatrix<int> n_coll_cell;
 
   std::valarray<real_number> scaled_k;
+  std::valarray<real_number> rel_vel;
+  std::valarray<real_number> delta;
+
+  // Index for choosing cells within collisional subdomain
+  std::map< int, std::vector<int> > cells_ind;
+  std::array<int, N_COLLISION_SUBDOM> n_cells_x;
+  std::array<int, N_COLLISION_SUBDOM> low_x_quad;
+  std::array<int, N_COLLISION_SUBDOM> low_y_quad;
+  std::array<int, N_COLLISION_SUBDOM> up_x_quad;
+  std::array<int, N_COLLISION_SUBDOM> up_y_quad;
 
   // References
   const int& npart;
@@ -42,7 +77,7 @@ private:
   const real_number& sigma, delta_t;
 
   // Utilities
-  real_number vr = 0.0;
+  real_number vr = 0.0, scalar_prod = 0.0;
   const real_number lx_sub, ux_sub, ly_sub, uy_sub;
 
   inline void gen_scaled_k(void)
@@ -50,6 +85,50 @@ private:
     rng->sample_unit_sphere(scaled_k[0], scaled_k[1], scaled_k[2]);
     scaled_k *= sigma;
   }
+
+  // NEED TO DEBUG !!!
+  inline std::pair<real_number, real_number> lexico_inv_quad(int idx, int q) const
+  {
+    int j = idx / n_cells_x[q];
+    int i = idx - j * n_cells_x[q];
+    return std::make_pair(i, j);
+  }
+
+  inline std::pair<real_number, real_number> map_to_domain(int i_loc, int j_loc, int q) const
+  {
+    return std::make_pair(i_loc + low_x_quad[q], j_loc + low_y_quad[q]);
+  }
+
+  void init_cell_ind_map (void);
+  void setup_cell_ind_map (void);
+
+  // PARALLEL COMMUNICATION
+  /* IT MAY BE SIMPLIFIED, MOST PROBABLY */
+  std::map< int, int > n_parallel_collisions_send;
+  std::map< int, int > n_parallel_collisions_recv;
+  process_map< int > cells1_process_map;
+  process_map< int > particle1_process_map;
+  process_map< std::valarray<real_number> >  scaled_k_process_map;
+  process_map< int > cells2_process_map_send;
+  process_map< int > cells2_process_map_recv;
+  process_map< int > hcells2_process_map_send;
+  process_map< int > hcells2_process_map_recv;
+  process_map< int > numdens_process_map_send;
+  process_map< int > numdens_process_map_recv;
+  process_map< real_number > aveta_mid_process_map_send;
+  process_map< real_number > aveta_mid_process_map_recv;
+  process_map< VelocityType > velocity_process_map_send;
+  process_map< VelocityType > velocity_process_map_recv;
+  process_map< VelocityType > delta_process_map_send;
+  process_map< VelocityType > delta_process_map_recv;
+  process_map< int > perform_collision_send;
+  process_map< int > perform_collision_recv;
+
+  MPI_Datatype MPI_VELOCITY_TYPE;
+  void commit_velocity_type(void);
+
+  CollisionCounter perform_parallel_collisions (void);
+  void reset_parallel_buffers (void);
 
 public:
 
@@ -60,9 +139,11 @@ public:
 
   void compute_majorants(void);
   void compute_collision_number(void);
+  void perform_collisions(void);
 
   // DEBUG
   void print_subdomain_order(void) const;
+  void test_map_to_domain_collision(void);
 
 };
 

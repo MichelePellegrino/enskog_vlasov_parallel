@@ -85,14 +85,7 @@ DensityKernel::DensityKernel
       weights /= sum_w;
     }
     par_env->broadcast(*weights.data(), weights.size());
-    // DEBUG
-    // # # # # #
-    if (par_env->get_rank() == 3)
-    {
-      std::ofstream file1("output_files/weights.txt");
-      file1 << weights;
-      file1.close();
-    }
+    compute_ind_map_part();
   }
 
 void
@@ -148,13 +141,14 @@ DensityKernel::fill_dummy_field
 
   // Copying inner data
   num_dens_cell.copy_patch<int>(n_part_cell, n_part_cell.get_lx(), n_part_cell.get_ly());
+  num_dens_cell /= grid->get_cell_volume();
 
   // CASE: periodic B.C. on each and every edge...
-  /*
   for(int r = 0; r < N_BUF; ++r )
-    num_dens_cell.set_outer_block( r, num_dens_cell.get_inner_block( ev_matrix::reflect_idx(r) ) );
-  num_dens_cell /= grid->get_cell_volume();
-  */
+  {
+    if ( num_dens_cell.rank_from_idx(r) == par_env->get_rank() )
+      num_dens_cell.set_outer_block( r, num_dens_cell.get_inner_block( ev_matrix::reflect_idx(r) ) );
+  }
 
   int idx_recv = MPI_NO_RANK;
   int rank_send = MPI_NO_RANK;
@@ -170,10 +164,11 @@ DensityKernel::fill_dummy_field
         rank_send = num_dens_cell.rank_from_idx(idx);
         if (rank_send != MPI_NO_RANK && rank_send!=rank )
         {
-          /* USE A SEND VERSION FROM PAR. ENV. !!! */
-          // MPI_Send(&idx, 1, MPI_INT, rank_send, 0, MPI_COMM_WORLD);
           par_env->send(idx, rank_send);
+          // DEBUG
+          // # # # # #
           // std::cout << "rank " << rank << " sending block " << idx << std::endl;
+          // # # # # #
           num_dens_cell.send_block(idx);
         }
       }
@@ -185,10 +180,12 @@ DensityKernel::fill_dummy_field
       for (int i = 0; i<n_recv; ++i)
       {
         /* USE A RECV VERSION FROM PAR. ENV. !!! */
-        // MPI_Recv(&idx_recv, 1, MPI_INT, k, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         par_env->receive(idx_recv, k);
         idx_recv = num_dens_cell.reflect_idx(idx_recv);
+        // DEBUG
+        // # # # # #
         // std::cout << "rank " << rank << " receiving block " << idx_recv << std::endl;
+        // # # # # #
         num_dens_cell.recv_block(idx_recv);
       }
     }
@@ -210,4 +207,14 @@ DensityKernel::compute_avg_density
 (void)
 {
   avg_convolutioner.convolute();
+}
+
+void
+DensityKernel::perform_density_kernel
+(void)
+{
+  binning();
+  fill_dummy_field();
+  compute_reduced_density();
+  compute_avg_density();
 }

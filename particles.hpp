@@ -45,11 +45,6 @@ private:
    */
   void populate(void);
 
-  /*! \fn exchange_particles
-   *  \brief Exchage particles between processes, based on their position
-   */
-  void exchange_particles(void);
-
   std::vector<int> inc_matrix;        /*!< Incidence matrix (may be sparse) */
   int inc_particles = 0;              /*!< ... */
   int dep_particles = 0;              /*!< ... */
@@ -63,16 +58,6 @@ private:
    */
   void fill_inc_matrix(void);
 
-  /*! \fn
-   *  \brief [...]
-   */
-  void add_to_inc_matrix(int);
-
-  /*! \fn clear_buffers
-   *  \brief Clears send/receive buffers
-   */
-  void clear_buffers(void);
-
 public:
 
   Ensemble(DSMC*);
@@ -82,6 +67,21 @@ public:
 
   /* UTILITIES */
   // void save_to_file(const std::string&) const;
+
+  /*! \fn clear_buffers
+   *  \brief Clears send/receive buffers
+   */
+  void clear_buffers(void);
+
+  /*! \fn
+   *  \brief [...]
+   */
+  void add_to_inc_matrix(int);
+
+  /*! \fn exchange_particles
+   *  \brief Exchage particles between processes, based on their position
+   */
+  void exchange_particles(void);
 
   // Parameter getters
   inline const int& get_n_particles(void) const { return n_particles; }

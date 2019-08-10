@@ -57,6 +57,8 @@ public:
   void compute_reduced_density (void);
   void compute_avg_density (void);
 
+  void perform_density_kernel(void);
+
   inline int get_n_cutoff_x(void) const { return n_cutoff_x; }
   inline int get_n_cutoff_y(void) const { return n_cutoff_y; }
 
