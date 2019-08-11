@@ -8,9 +8,9 @@ WARNINGS =
 # WARNINGS = -Wall
 OPTIMIZATION = -g
 # CPPFLAGS = -I./utility -I/usr/local/Cellar/eigen/3.3.7/include/eigen3 -I./quadrature
-CPPFLAGS = -I./utility -I./quadrature $(INCLUDE_EIGEN)
+CPPFLAGS = -I./utility $(INCLUDE_EIGEN)
 CXXFLAGS = $(WARNINGS) $(STANDARD) $(OPTIMIZATION)
-LDLIBS = -L./libraries -lquadrature
+# LDLIBS = -L./libraries -lquadrature
 
 EXEC = main
 

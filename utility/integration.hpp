@@ -1,54 +1,62 @@
+/*! \file integration.hpp
+ *  \brief Header containing classes for numerical integration
+ */
+
 #ifndef EV_INTEGRATION_HPP
 #define EV_INTEGRATION_HPP
 
+#define DEFAULT_EPS 1e-4
+
+#include <functional>
+
 #include "types.hpp"
-#include "numerical_integration.hpp"
-#include "numerical_rule.hpp"
+#include "romberg.hpp"
 
-#define DEFAULT_NINT 100
-
+/*! \namespace ev_numeric
+ *  \brief Namespace for numerical procedures
+ *
+ *  In this namespace are defined classes for numerical integration.
+ */
 namespace ev_numeric
 {
 
-using namespace NumericalIntegration;
-using namespace Geometry;
 
 enum IntegralType {Finite, Infinite};
 
+/*! \class NumericalIntegrator
+ *  \brief A class to perform numerical integration in finite and infinite 1D domains
+ */
 template<IntegralType dummy_integral_type>
 class NumericalIntegrator
 { };
 
+/* Template specialization for finite-domain integrals */
 template<>
 class NumericalIntegrator<Finite>
 {
 private:
-  std::function<real_number(real_number)> func;                                 // integrand for finite integral                                                                    // discretization
-  int nint;
-  Domain1D domain;
-  Mesh1D mesh;
-  Quadrature quad;
+  std::function<real_number(real_number)> func;
+  real_number a, b;
+  real_number eps;
 public:
   NumericalIntegrator() = default;
   NumericalIntegrator
-  (std::function<real_number(real_number)> FUN, real_number A, real_number B, int N = DEFAULT_NINT):
-    func(FUN), nint(N), domain(A,B), mesh(domain,N), quad(MidPoint(),mesh) { }
+  (std::function<real_number(real_number)> FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS):
+    func(FUN), a(A), b(B), eps(EPS) { }
   real_number integrate ( void )
   {
-    return quad.apply(func);
+    return qromb(func, a, b, eps);
   }
   real_number integrate
-  (std::function<real_number(real_number)> FUN, real_number A, real_number B)
+  (std::function<real_number(real_number)> FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS)
   {
-    domain.left() = A;
-    domain.right() = B;
-    Mesh1D dummy_mesh(domain,nint);
-    mesh = dummy_mesh;
-    return quad.apply(func);
+    a = A; b = B;
+    return qromb(func, a, b, eps);
   }
   ~NumericalIntegrator() = default;
 };
 
+/* Template specialization for infinite-domain integrals */
 template<>
 class NumericalIntegrator<Infinite>
 {
@@ -56,31 +64,27 @@ private:
   std::function<real_number(real_number)> func;                                 // integrand for finite integral
   std::function<real_number(real_number)> funk                                  // integrand for infinite integral
     = [this](real_number x) { return func(1.0/x)/(x*x); };
-  int nint;
-  Domain1D domain;
-  Mesh1D mesh;
-  Quadrature quad;
+  real_number a, b;
+  real_number eps;
 public:
   NumericalIntegrator() = default;
   NumericalIntegrator
-  (std::function<real_number(real_number)> FUN, real_number A, real_number B, int N = DEFAULT_NINT):
-    func(FUN), nint(N), domain(1.0/B, 1.0/A), mesh(domain,N), quad(MidPoint(),mesh) { }
+  (std::function<real_number(real_number)> FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS):
+    func(FUN), a(1.0/B), b(1.0/A), eps(EPS) { }
   real_number integrate ( void )
   {
-    return quad.apply(funk);
+    return qromb(funk, a, b, eps);
   }
   real_number integrate
-  (std::function<real_number(real_number)> FUN, real_number A, real_number B)
+  (std::function<real_number(real_number)> FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS)
   {
-    domain.left() = 1.0/B;
-    domain.right() = 1.0/A;
-    Mesh1D dummy_mesh(domain,nint);         mesh = dummy_mesh;
-    Quadrature dummy_quad(MidPoint(),mesh); quad = dummy_quad;
-    return quad.apply(funk);
+    a = 1.0/B;
+    b = 1.0/A;
+    return qromb(funk, a, b, eps);
   }
   ~NumericalIntegrator() = default;
 };
 
-}
+} /* namespace ev_numeric */
 
 #endif /* EV_INTEGRATION_HPP */
