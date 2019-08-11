@@ -8,6 +8,8 @@
 #include "potential.hpp"
 #include "correlations.hpp"
 
+#include <cassert>
+
 class ParallelEnvironment;
 class IOHandler;
 class ConfigurationReader;
