@@ -1,9 +1,14 @@
 CXX = mpicxx
 
+INCLUDE_EIGEN = -I/usr/local/Cellar/eigen/3.3.7/include/eigen3
+# INCLUDE_EIGEN = -I/home/matematica/mpellegrino/eigen/3.3.7/include/eigen3
+
 STANDARD = -std=c++11
-WARNINGS = -Wall
+WARNINGS =
+# WARNINGS = -Wall
 OPTIMIZATION = -g
-CPPFLAGS = -I./utility -I/usr/local/Cellar/eigen/3.3.7/include/eigen3 -I./quadrature
+# CPPFLAGS = -I./utility -I/usr/local/Cellar/eigen/3.3.7/include/eigen3 -I./quadrature
+CPPFLAGS = -I./utility -I./quadrature $(INCLUDE_EIGEN)
 CXXFLAGS = $(WARNINGS) $(STANDARD) $(OPTIMIZATION)
 LDLIBS = -L./libraries -lquadrature
 

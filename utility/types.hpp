@@ -3,6 +3,7 @@
 
 #include <limits>
 #include <string>
+#include <memory>
 #include <mpi.h>
 
 #ifndef DefaultPointer
