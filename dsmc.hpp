@@ -3,12 +3,30 @@
 
 #include "types.hpp"
 #include "random.hpp"
+#include "stopwatch.hpp"
 #include "species.hpp"
 #include "times.hpp"
 #include "potential.hpp"
 #include "correlations.hpp"
 
 #include <cassert>
+
+#ifndef DEFAULT_ITER_THERMO
+#define DEFAULT_ITER_THERMO 10
+#endif
+
+#ifndef DEFAULT_ITER_SAMPLE
+#define DEFAULT_ITER_SAMPLE 100
+#endif
+
+#ifndef DEFAULT_DUMMY_ITER
+#define DEFAULT_DUMMY_ITER 500
+#endif
+
+#define DENSITY_TAG 0
+#define FORCES_TAG 1
+#define ADVECT_TAG 2
+#define COLLISION_TAG 3
 
 class ParallelEnvironment;
 class IOHandler;
@@ -54,6 +72,12 @@ private:
 
   CorrelationFun correlation;
 
+  Stopwatch<DefaultWatchPrecision> stopwatch;
+
+  // NEED TO STORE LOCALLY:
+  int n_iter_thermo = DEFAULT_ITER_THERMO;
+  int n_iter_sample = DEFAULT_ITER_SAMPLE;
+
 public:
 
   DSMC(const DefaultString&);
@@ -76,6 +100,17 @@ public:
   inline DefaultPointer<TimeMarching<TM>>& get_time_marching() { return time_marching; }
   inline DefaultPointer<CollisionHandler>& get_collision_handler() { return collision_handler; }
   inline CorrelationFun& get_correlation() { return correlation; }
+
+  // Testing
+  void test_density(void);
+  void test_force_field(void);
+  void test_time_marching(void);
+  void test_collisions(void);
+
+  // Initialize
+  void initialize_simulation(void);
+  void dsmc_iteration(void);
+  void dsmc_loop(void);
 
 };
 

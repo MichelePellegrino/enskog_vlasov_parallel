@@ -40,12 +40,11 @@ Topology::Topology
 
   // DEBUG
   // # # # # #
-  /*
   for (int r = 0; r<size; ++r)
   {
     if (rank==r)
     {
-      std::cout << " >> Rank " << r << " has limits: ["<<idx_lx[r]<<","<<idx_ux[r]<<";"<<idx_ly[r]<<","<<idx_uy[r]<<"]" << std::endl;
+      std::cout << " >> Rank " << r << " has limits: ["<<idx_lx_rank<<","<<idx_ux_rank<<";"<<idx_ly_rank<<","<<idx_uy_rank<<"]" << std::endl;
       std::cout << "   quarters: ["<<quarter_lx[0]<<","<<quarter_ux[0]<<";"<<quarter_ly[0]<<","<<quarter_uy[0]<<"]" <<
         " ["<<quarter_lx[1]<<","<<quarter_ux[1]<<";"<<quarter_ly[1]<<","<<quarter_uy[1]<<"]" <<
         " ["<<quarter_lx[2]<<","<<quarter_ux[2]<<";"<<quarter_ly[2]<<","<<quarter_uy[2]<<"]" <<
@@ -53,7 +52,6 @@ Topology::Topology
     }
     par_env->barrier();
   }
-  */
   // # # # # #
 
 }
@@ -112,6 +110,7 @@ Topology::fill_topology_map
   idx_ly_rank = idx_ly[par_env->get_rank()];
   idx_ux_rank = idx_ux[par_env->get_rank()];
   idx_uy_rank = idx_uy[par_env->get_rank()];
+
 }
 
 void
@@ -170,19 +169,21 @@ Topology::setup_quarters
 {
   // assert(N_COLLISION_SUBDOM>=4 && N_COLLISION_SUBDOM%2==0 && "Not yet implemented for a generic number of collisional subdomains");
   assert(N_COLLISION_SUBDOM==4 && "Not yet implemented for a no. subdomains != 4");
-  int div_x = sqrt(N_COLLISION_SUBDOM);
-  int div_y = N_COLLISION_SUBDOM/div_x;
-  int delta_x = (idx_ux_rank-idx_lx_rank)/div_x;
-  int delta_y = (idx_uy_rank-idx_ly_rank)/div_y;
-  int reminder_x = ((idx_ux_rank-idx_lx_rank)%div_x>0);
-  int reminder_y = ((idx_uy_rank-idx_ly_rank)%div_y>0);
+  int div_x = 2;
+  int div_y = 2;
+  int delta_x = (idx_ux_rank-idx_lx_rank) / div_x;
+  int delta_y = (idx_uy_rank-idx_ly_rank) / div_y;
+  int reminder_x = ( (idx_ux_rank-idx_lx_rank)%div_x>0 );
+  int reminder_y = ( (idx_uy_rank-idx_ly_rank)%div_y>0 );
+  // int reminder_x = (idx_ux_rank-idx_lx_rank) % div_x;
+  // int reminder_y = (idx_uy_rank-idx_ly_rank) % div_y;
   // *** NB: ACCOUNT FOR THE REMINDER !!! ***
   for (int i = 0; i<N_COLLISION_SUBDOM; ++i)
   {
     quarter_lx[i] = idx_lx_rank + delta_x*(i%2);
     quarter_ly[i] = idx_ly_rank + delta_y*(i>=2);
-    quarter_ux[i] = quarter_lx[i] + delta_x + (rank%2) * reminder_x;
-    quarter_uy[i] = quarter_ly[i] + delta_y + (rank>=2) * reminder_y;
+    quarter_ux[i] = quarter_lx[i] + delta_x + (i%2) * reminder_x;
+    quarter_uy[i] = quarter_ly[i] + delta_y + (i>=2) * reminder_y;
     // quarter_ux[i] = idx_lx_rank + delta_x*(i%div_x+1);
     // quarter_uy[i] = idx_ly_rank + delta_y*(i%div_y+1);
     n_cells_quarter[i] = ( quarter_ux[i]-quarter_lx[i] ) * ( quarter_uy[i]-quarter_ly[i] );

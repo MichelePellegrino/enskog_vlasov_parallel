@@ -46,9 +46,9 @@ CollisionHandler::CollisionHandler
   delta_t( times->get_delta_t() ),
 
   lx_sub( a11.get_lx() ),
-  ux_sub( a11.get_ux()  ),
-  ly_sub( a11.get_ly()  ),
-  uy_sub( a11.get_uy()  )
+  ux_sub( a11.get_ux() ),
+  ly_sub( a11.get_ly() ),
+  uy_sub( a11.get_uy() )
 
   {
 
@@ -121,6 +121,10 @@ CollisionHandler::compute_majorants
       }
     }
   }
+  // DEBUG
+  // # # # # #
+  // print_reduced_constants();
+  // # # # # #
 }
 
 void
@@ -130,17 +134,14 @@ CollisionHandler::compute_collision_number
   real_number pfnc, cnc;
   n_coll_cell = 0;
   n_coll = 0;
-  for (int q = 0; q<N_COLLISION_SUBDOM; ++q)
+  for (int i = lx_sub; i<ux_sub; ++i)
   {
-    for (int i = low_x_quad[q]; i<up_x_quad[q]; ++i)
+    for (int j = ly_sub; j<uy_sub; ++j)
     {
-      for (int j = low_y_quad[q]; j<up_y_quad[q]; ++j)
-      {
-        cnc = ev_const::pi2*sigma*sigma*a11(i,j)*vrmax11(i,j)*delta_t;
-        n_coll_cell(i,j) = (int)cnc;
-        pfnc = cnc - n_coll_cell(i,j);
-        if ( rng->sample_uniform() < pfnc ) n_coll_cell(i,j)++;
-      }
+      cnc = ev_const::pi2*sigma*sigma*a11(i,j)*vrmax11(i,j)*delta_t;
+      n_coll_cell(i,j) = (int)cnc;
+      pfnc = cnc - n_coll_cell(i,j);
+      if ( rng->sample_uniform() < pfnc ) n_coll_cell(i,j)++;
     }
   }
   n_coll = n_coll_cell.sum();
@@ -195,12 +196,13 @@ CollisionHandler::perform_collisions
   shuffle_order();
   // Reset number of collisions
   int out_bound = 0;
+  n_fake = 0; n_real = 0; n_total = 0;
   // DEBUG
   // # # # # #
-  // int cells_no_collisions = 0, cells_with_collisions = 0;
-  // int dummy_counter = 0;
+  print_est_collisions();
+  int parallel_counter = 0, communication_counter = 0;
+  int null_density_counter = 0, scalar_prod_counter = 0;
   // # # # # #
-  n_fake = 0, n_real = 0, n_total = 0;
   for (int q : subdom_order)
   {
     reset_parallel_buffers();
@@ -217,16 +219,8 @@ CollisionHandler::perform_collisions
       i_cell1 = map_to_domain(i_cell1_quad, j_cell1_quad, q).first;
       j_cell1 = map_to_domain(i_cell1_quad, j_cell1_quad, q).second;
       // (2) Select a particle belonging to cell at random with equiprobability
-      // DEBUG
-      // # # # # #
-      // if (n_coll_cell(i_cell1, j_cell1)==0) cells_no_collisions++;
-      // # # # # #
       for (int i1 = 0; i1 < n_coll_cell(i_cell1, j_cell1); i1++)
       {
-        // DEBUG
-        // # # # # #
-        // cells_with_collisions++;
-        // # # # # #
         idx_p1 = density->iof(idx_cell1) + (int)( rng->sample_uniform() *
           density->get_npc(i_cell1, j_cell1) );
         idx_p1 = density->ind(idx_p1);
@@ -254,12 +248,16 @@ CollisionHandler::perform_collisions
         rank_coll_part = topology->get_topology_map(i_cell2,j_cell2);
         if ( rank_coll_part == rank )
         {
+          // DEBUG
+          // # # # # #
+          parallel_counter++;
+          // # # # # #
           // 'SERIAL' PART
           if( ( density->get_npc(i_cell2, j_cell2)>0 ) )
           {
             // DEBUG
-            // # # # # #
-            // dummy_counter++;
+            // # # # # #
+            null_density_counter++;
             // # # # # #
             // (4) Select at random with equiprobability a particle in the cell where the k-vector points
             idx = density->iof(idx_cell2) + (int)( rng->sample_uniform() * density->get_npc(i_cell2, j_cell2) );
@@ -279,6 +277,10 @@ CollisionHandler::perform_collisions
               a11(i_cell2, j_cell2) = anew(i_cell2, j_cell2);
             if( scalar_prod > 0.0 )
             {
+              // DEBUG
+              // # # # # #
+              scalar_prod_counter++;
+              // # # # # #
               fk = scalar_prod * aa / ( a11(i_cell1, j_cell1) * vrmax11(i_cell1, j_cell1) );
               if (fk > 1.0)
                 out_bound++;
@@ -304,6 +306,10 @@ CollisionHandler::perform_collisions
         else
         {
           // PARALLEL COMMUNICATION - PREPARATION
+          // DEBUG
+          // # # # # #
+          communication_counter++;
+          // # # # # #
           n_parallel_collisions_send[rank_coll_part]++;
           cells1_process_map[rank_coll_part].push_back(grid->lexico(i_cell1, j_cell1));
           particle1_process_map[rank_coll_part].push_back(idx_p1);
@@ -326,6 +332,11 @@ CollisionHandler::perform_collisions
     if (rank==r)
     {
       std::cout << "collisions performed by rank " << r << std::endl;
+      // DEBUG
+      // # # # # #
+      std::cout << "local / communication : " << parallel_counter << " / " << communication_counter << std::endl;
+      std::cout << "density counter = " << null_density_counter << ";\t scalar counter = " << scalar_prod_counter << std::endl;
+      // # # # # #
       std::cout << "total = " << n_total << "\t real = " << n_real << "\t fake = " << n_fake << "\t out-range = " << out_bound << std::endl;
     }
     par_env->barrier();
@@ -542,6 +553,28 @@ CollisionHandler::print_subdomain_order
   for (int i = 0; i<N_COLLISION_SUBDOM; ++i)
     std::cout << subdom_order[i] << "\t";
   std::cout << std::endl;
+}
+
+void
+CollisionHandler::print_est_collisions
+(void) const
+{
+  for (int r = 0; r<size; ++r) {
+    if (r==rank)
+      std::cout << "rank " << r << " simulates " << n_coll << " collisions" << std::endl;
+  }
+  par_env->barrier();
+}
+
+void
+CollisionHandler::print_reduced_constants
+(void) const
+{
+  for (int r = 0; r<size; ++r) {
+    if (r==rank)
+      std::cout << "rank " << r << " : sum(a11) = " << a11.sum() << ";\t sum(vrm11) = " << vrmax11.sum() << std::endl;
+  }
+  par_env->barrier();
 }
 
 void

@@ -665,16 +665,6 @@ ConfigurationReader::read_conf_file
   }
 
   par_env->broadcast(seed);
-  par_env->broadcast(diam_fluid);
-  par_env->broadcast(diam_solid);
-  par_env->broadcast(mass_fluid);
-  par_env->broadcast(mass_solid);
-  par_env->broadcast(nc_out);
-  par_env->broadcast(restart);
-  par_env->broadcast(t_ini);
-  par_env->broadcast(t_max);
-  par_env->broadcast(t_im);
-  par_env->broadcast(delta_t);
   par_env->broadcast(L_x_1);
   par_env->broadcast(L_x_2);
   par_env->broadcast(L_y_1);
@@ -686,6 +676,14 @@ ConfigurationReader::read_conf_file
     par_env->broadcast(wall_cond[i]);
   }
 
+  par_env->broadcast(diam_fluid);
+  par_env->broadcast(diam_solid);
+  par_env->broadcast(mass_fluid);
+  par_env->broadcast(mass_solid);
+
+  par_env->broadcast(phi11);
+  par_env->broadcast(gamma11);
+
   par_env->broadcast(n_cells_x);
   par_env->broadcast(n_cells_y);
   par_env->broadcast(x_min);
@@ -695,12 +693,23 @@ ConfigurationReader::read_conf_file
   par_env->broadcast(x_extra);
   par_env->broadcast(y_extra);
 
+  par_env->broadcast(eta_liq0);
+  par_env->broadcast(eta_liq1);
+
   par_env->broadcast(n_part);
   int rem = n_part % par_env->get_size();
   n_part = n_part / par_env->get_size();
   if ( par_env->get_rank()<rem ) n_part++;
 
-  par_env->broadcast(phi11);
-  par_env->broadcast(gamma11);
+  par_env->broadcast(nc_out);
+  par_env->broadcast(restart);
+  par_env->broadcast(t_ini);
+  par_env->broadcast(t_max);
+  par_env->broadcast(t_im);
+  par_env->broadcast(delta_t);
+
+  par_env->broadcast(niter_thermo);
+  par_env->broadcast(T_ref);
+  par_env->broadcast(T_ini);
 
 }

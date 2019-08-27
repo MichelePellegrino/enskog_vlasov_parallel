@@ -77,6 +77,11 @@ public:
   inline const int iof(int k) const { return cum_num[k]; }
   inline const int ind(int k) const { return idx_map[k]; }
 
+  // DEBUG
+  void print_binned_particles(void) const;
+  void print_reduced_numdens(void) const;
+  void print_reduced_aveta(void) const;
+
 };
 
 #endif /* EV_DENSITIES_HPP */

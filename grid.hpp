@@ -67,6 +67,9 @@ public:
   inline const real_number get_xc(int i) const { return xc[i]; }
   inline const real_number get_yc(int j) const { return yc[j]; }
 
+  // DEBUG
+  void print_info(void) const;
+
 };
 
 

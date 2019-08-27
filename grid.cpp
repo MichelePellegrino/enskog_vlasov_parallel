@@ -2,6 +2,11 @@
 #include "boundary.hpp"
 #include "configuration.hpp"
 
+// DEBUG
+// # # # # #
+#include "parallel_environment.hpp"
+// # # # # #
+
 #include <cassert>
 
 Grid::Grid
@@ -23,6 +28,7 @@ Grid::Grid
   xc(n_cells_x),
   yc(n_cells_y)
   {
+
     // Coerence check x1
     if ( boundary->get_pct().find(boundary->get_wall_condition()[0]) == boundary->get_pct().end() )
     {
@@ -81,4 +87,25 @@ Grid::Grid
     // Initialize centroids
     for ( int i = 0; i < n_cells_x; ++i)  xc[i] = x_min + ( i+0.5 ) * dx;
     for ( int j = 0; j < n_cells_y; ++j)  yc[j] = y_min + ( j+0.5 ) * dy;
+
+    // DEBUG
+    // # # # # #
+    // print_info();
+    // # # # # #
+
   }
+
+
+// DEBUG
+
+void
+Grid::print_info
+(void) const
+{
+  for ( int r = 0; r<par_env->get_size(); ++r )
+  {
+    if ( r == par_env->get_rank() )
+      std::cout << "rank " << r << " : cell volume = " << cell_volume << ";\t dx = " << dx << std::endl;
+  }
+  par_env->barrier();
+}

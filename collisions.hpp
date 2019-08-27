@@ -143,6 +143,8 @@ public:
 
   // DEBUG
   void print_subdomain_order(void) const;
+  void print_est_collisions(void) const;
+  void print_reduced_constants(void) const;
   void test_map_to_domain_collision(void);
 
 };

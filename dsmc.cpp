@@ -60,38 +60,88 @@ time_marching (
 collision_handler (
   new CollisionHandler(this)
 ),
-correlation ()
+correlation (),
+stopwatch(4, "millisecond")
 {
   // TESTING
-  /*
   par_env->barrier();
-  if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: binning and number density ###" << std::endl;
-  density->binning();
-  if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: filling density field ###" << std::endl;
-  density->fill_dummy_field();
-  if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: computing reduced density ###" << std::endl;
-  density->compute_reduced_density();
-  if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: computing averaged density ###" << std::endl;
-  density->compute_avg_density();
+  test_density();
+  test_force_field();
+  test_time_marching();
+  // if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: collision in quarter-subdomain map ###" << std::endl;
+  // collision_handler->test_map_to_domain_collision();
+  test_collisions();
+}
+
+
+// Testing
+void
+DSMC::test_density
+(void)
+{
+  if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: performing density kernel ###" << std::endl;
+  stopwatch.local_start(DENSITY_TAG);
+  density->perform_density_kernel();
+  par_env->barrier();
+  stopwatch.local_stop(DENSITY_TAG);
+  if (par_env->get_rank()==MPI_MASTER) stopwatch.show_local_elapsed(DENSITY_TAG);
+}
+
+void
+DSMC::test_force_field
+(void)
+{
   if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: computing force field ###" << std::endl;
+  stopwatch.local_start(FORCES_TAG);
   mean_field->compute_force_field();
-  if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: time-marching ###" << std::endl;
-  time_marching->update_ensemble();
-  // if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: shuffling collisional subdomains ###" << std::endl;
-  // int n_tests = 5;
-  // for (int i = 0; i<n_tests; ++i)
-  // {
-  //   collision_handler->shuffle_order();
-  //   if (par_env->get_rank()==2)
-  //     collision_handler->print_subdomain_order();
-  // }
-  // par_env->barrier();
-  if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: computing majorants ###" << std::endl;
-  collision_handler->compute_majorants();
   par_env->barrier();
-  if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: collision in quarter-subdomain map ###" << std::endl;
-  collision_handler->test_map_to_domain_collision();
+  stopwatch.local_stop(FORCES_TAG);
+  if (par_env->get_rank()==MPI_MASTER) stopwatch.show_local_elapsed(FORCES_TAG);
+}
+
+void
+DSMC::test_time_marching
+(void)
+{
+  if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: time-marching ###" << std::endl;
+  stopwatch.local_start(ADVECT_TAG);
+  time_marching->update_ensemble();
+  par_env->barrier();
+  stopwatch.local_stop(ADVECT_TAG);
+  if (par_env->get_rank()==MPI_MASTER) stopwatch.show_local_elapsed(ADVECT_TAG);
+}
+
+void
+DSMC::test_collisions
+(void)
+{
   if (par_env->get_rank()==MPI_MASTER) std::cout << "### TEST: performing collisions ###" << std::endl;
+  stopwatch.local_start(COLLISION_TAG);
+  collision_handler->compute_majorants();
   collision_handler->perform_collisions();
-  */
+  par_env->barrier();
+  stopwatch.local_stop(COLLISION_TAG);
+  if (par_env->get_rank()==MPI_MASTER) stopwatch.show_local_elapsed(COLLISION_TAG);
+}
+
+// Initialize
+void
+DSMC::initialize_simulation
+(void)
+{
+
+}
+
+void
+DSMC::dsmc_iteration
+(void)
+{
+
+}
+
+void
+DSMC::dsmc_loop
+(void)
+{
+
 }

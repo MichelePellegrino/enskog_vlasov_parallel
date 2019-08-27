@@ -14,6 +14,9 @@ using namespace ev_numeric;
 #define DUMMY_A -1
 #define DUMMY_B 1
 
+#define CUTOFF_Z 10
+#define ZERO_THRESHOLD 1e-4
+
 class ForceField : protected Motherbase
 {
 

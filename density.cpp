@@ -165,10 +165,6 @@ DensityKernel::fill_dummy_field
         if (rank_send != MPI_NO_RANK && rank_send!=rank )
         {
           par_env->send(idx, rank_send);
-          // DEBUG
-          // # # # # #
-          // std::cout << "rank " << rank << " sending block " << idx << std::endl;
-          // # # # # #
           num_dens_cell.send_block(idx);
         }
       }
@@ -179,13 +175,8 @@ DensityKernel::fill_dummy_field
       // std::cout << "rank " << rank << " should receive " << num_dens_cell.n_idx_from_rank(k) << " times" << std::endl;
       for (int i = 0; i<n_recv; ++i)
       {
-        /* USE A RECV VERSION FROM PAR. ENV. !!! */
         par_env->receive(idx_recv, k);
         idx_recv = num_dens_cell.reflect_idx(idx_recv);
-        // DEBUG
-        // # # # # #
-        // std::cout << "rank " << rank << " receiving block " << idx_recv << std::endl;
-        // # # # # #
         num_dens_cell.recv_block(idx_recv);
       }
     }
@@ -217,4 +208,45 @@ DensityKernel::perform_density_kernel
   fill_dummy_field();
   compute_reduced_density();
   compute_avg_density();
+  // DEBUG
+  // # # # # #
+  // print_binned_particles();
+  // print_reduced_numdens();
+  // print_reduced_aveta();
+  // # # # # #
+}
+
+// TESTING
+
+void
+DensityKernel::print_binned_particles
+(void) const
+{
+  for (int r = 0; r<par_env->get_size(); ++r) {
+    if ( r==par_env->get_rank() )
+      std::cout << "rank " << r << " : binned particles = " << n_part_cell.sum() << std::endl;
+  }
+  par_env->barrier();
+}
+
+void
+DensityKernel::print_reduced_numdens
+(void) const
+{
+  for (int r = 0; r<par_env->get_size(); ++r) {
+    if ( r==par_env->get_rank() )
+      std::cout << "rank " << r << " : reduced numdens = " << num_dens_cell.sum() << std::endl;
+  }
+  par_env->barrier();
+}
+
+void
+DensityKernel::print_reduced_aveta
+(void) const
+{
+  for (int r = 0; r<par_env->get_size(); ++r) {
+    if ( r==par_env->get_rank() )
+      std::cout << "rank " << r << " : reduced aveta = " << average_reduced_density.sum() << std::endl;
+  }
+  par_env->barrier();
 }

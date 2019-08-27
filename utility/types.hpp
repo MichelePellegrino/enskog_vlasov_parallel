@@ -34,6 +34,10 @@
 #define MPI_DEFAULT_TAG 0
 #endif
 
+#ifndef DefaultWatchPrecision
+#define DefaultWatchPrecision std::chrono::milliseconds
+#endif
+
 enum MarchingType
 {
   Standard,

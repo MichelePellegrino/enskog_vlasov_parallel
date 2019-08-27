@@ -32,7 +32,7 @@ ForceField::ForceField(DSMC* dsmc):
 {
   if(par_env->get_rank()==MPI_MASTER)
     std::cout << "### COMPUTING POTENTIAL KERNEL MATRIX ###" << std::endl;
-  compute_kernel_matrix();
+  // compute_kernel_matrix();
 }
 
 void
@@ -69,21 +69,21 @@ ForceField::compute_integral
   if ( tmp > 0.0 )
   {
     return (
-      infinite_integrator.integrate(psi, ev_const::minfty, -sqrt(tmp))
+      infinite_integrator.integrate(psi, -CUTOFF_Z, -sqrt(tmp))
       + finite_integrator.integrate(psi, -sqrt(tmp), sqrt(tmp))
-      + infinite_integrator.integrate(psi, sqrt(tmp), ev_const::pinfty)   );
+      + infinite_integrator.integrate(psi, sqrt(tmp), CUTOFF_Z)   );
   }
   else if ( tmp < 0.0 )
   {
     return (
-      infinite_integrator.integrate(psi, ev_const::minfty, -sqrt(-tmp))
-      + infinite_integrator.integrate(psi, sqrt(-tmp), ev_const::pinfty)  );
+      infinite_integrator.integrate(psi, -CUTOFF_Z, -sqrt(-tmp))
+      + infinite_integrator.integrate(psi, sqrt(-tmp), CUTOFF_Z)  );
   }
   else
   {
     return (
-      infinite_integrator.integrate(psi, ev_const::minfty, -zero_threshold)
-      + infinite_integrator.integrate(psi, zero_threshold, ev_const::pinfty) );
+      infinite_integrator.integrate(psi, -CUTOFF_Z, -ZERO_THRESHOLD)
+      + infinite_integrator.integrate(psi, ZERO_THRESHOLD, CUTOFF_Z) );
   }
 }
 
