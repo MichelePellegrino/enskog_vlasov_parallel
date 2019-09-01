@@ -63,6 +63,9 @@ public:
     std::cout << "Elapsed time: " << local_elapsed[k] << " " << time_unit << std::endl;
   }
 
+  int get_global_elapsed(void) const { return global_elapsed; }
+  int get_local_elapsed(int k) const { return local_elapsed[k]; }
+
 };
 
 #endif /* STOPWATCH_HPP */

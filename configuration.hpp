@@ -103,6 +103,7 @@ private:
   char c_med_comp_type;                     // ORIGINAL: c_med_comp_type (choice for build_I_matrix routine)
   bool collstat;                            // ORIGINAL: collstat	(collisions statistics off/on [0/1])
   int ndom;                                 // ORIGINAL: ndom	(number of subdomains for statistics)
+  int niter_sampling;                       // No. iterations for sampling
 
 public:
 
@@ -148,6 +149,7 @@ public:
   inline real_number get_delta_t() const { return delta_t; }
 
   inline int get_niter_thermo() const { return niter_thermo; }
+  inline int get_niter_sampling() const { return niter_sampling; }
   inline real_number get_T_ref() const { return T_ref; }
   inline real_number get_T_ini() const { return T_ini; }
 

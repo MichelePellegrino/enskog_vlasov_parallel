@@ -43,5 +43,6 @@ ParallelEnvironment::barrier
 void
 ParallelEnvironment::test_output(void)
 {
-  io_hand << "RANK "; io_hand << rank; io_hand << " WELCOMES YOU\n";
+  if (rank == MPI_MASTER)
+    std::cout << "RANK " << rank << " WELCOMES YOU" << std::endl;
 }

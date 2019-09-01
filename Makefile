@@ -16,7 +16,7 @@ EXEC = main
 
 SRC = dsmc.cpp parallel_environment.cpp display.cpp configuration.cpp boundary.cpp grid.cpp
 SRC += topology.cpp particles.cpp density.cpp potential.cpp force_field.cpp collisions.cpp
-SRC += $(EXEC).cpp
+SRC += thermostat.cpp sampling.cpp output.cpp $(EXEC).cpp
 
 OBJS = $(SRC: .cpp = .o)
 

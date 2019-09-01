@@ -12,7 +12,17 @@
 #include <array>
 #include <map>
 
+#ifndef TEST_COEFF_MULT
 #define TEST_COEFF_MULT 5
+#endif
+
+#ifndef DEFAULT_ALPHA_1
+#define DEFAULT_ALPHA_1 1e-2
+#endif
+
+#ifndef DEFAULT_ALPHA_2
+#define DEFAULT_ALPHA_2 0.99
+#endif
 
 struct VelocityType
 {
@@ -48,12 +58,20 @@ private:
   int n_real = 0;
   int n_total = 0;
 
+  // Vectors for storage
+  std::vector<int> n_fake_store;
+  std::vector<int> n_real_store;
+  std::vector<int> n_total_store;
+  std::vector<int> n_out_store;
+
   std::array<int, N_COLLISION_SUBDOM> subdom_order;
 
   ev_matrix::MaskMatrix<real_number> a11;
   ev_matrix::MaskMatrix<real_number> vrmax11;
 
+  // Computed at next iteration
   ev_matrix::MaskMatrix<real_number> anew;
+  ev_matrix::MaskMatrix<real_number> vrmaxnew;
 
   int n_coll;
   ev_matrix::MaskMatrix<int> n_coll_cell;
@@ -67,8 +85,6 @@ private:
   std::array<int, N_COLLISION_SUBDOM> n_cells_x;
   std::array<int, N_COLLISION_SUBDOM> low_x_quad;
   std::array<int, N_COLLISION_SUBDOM> low_y_quad;
-  std::array<int, N_COLLISION_SUBDOM> up_x_quad;
-  std::array<int, N_COLLISION_SUBDOM> up_y_quad;
 
   // References
   const int& npart;
@@ -86,7 +102,11 @@ private:
     scaled_k *= sigma;
   }
 
-  // NEED TO DEBUG !!!
+  // Controlling number of collisions
+  const real_number alpha_1 = DEFAULT_ALPHA_1;
+  const real_number alpha_2 = DEFAULT_ALPHA_2;
+  void update_majorants(void);
+
   inline std::pair<real_number, real_number> lexico_inv_quad(int idx, int q) const
   {
     int j = idx / n_cells_x[q];
@@ -141,11 +161,22 @@ public:
   void compute_collision_number(void);
   void perform_collisions(void);
 
+  void gather_collisions(void);
+
   // DEBUG
   void print_subdomain_order(void) const;
   void print_est_collisions(void) const;
   void print_reduced_constants(void) const;
   void test_map_to_domain_collision(void);
+
+  inline std::vector<int>& get_n_fake_store(void) { return n_fake_store; }
+  inline const std::vector<int>& get_n_fake_store(void) const { return n_fake_store; }
+  inline std::vector<int>& get_n_real_store(void) { return n_real_store; }
+  inline const std::vector<int>& get_n_real_store(void) const { return n_real_store; }
+  inline std::vector<int>& get_n_total_store(void) { return n_total_store; }
+  inline const std::vector<int>& get_n_total_store(void) const { return n_total_store; }
+  inline std::vector<int>& get_n_out_store(void) { return n_out_store; }
+  inline const std::vector<int>& get_n_out_store(void) const { return n_out_store; }
 
 };
 

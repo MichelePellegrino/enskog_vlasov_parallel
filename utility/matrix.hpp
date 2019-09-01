@@ -106,7 +106,11 @@ namespace ev_matrix {
     {
       return DynamicMatrix::block( idx_i(lx), idx_j(ly), ux-lx, uy-ly );
     }
-    void set_block( int lx, int ux, int ly, int uy, const data_type& rhs)
+    void set_block( int lx, int ux, int ly, int uy, const data_type& rhs )
+    {
+      DynamicMatrix::block( idx_i(lx), idx_j(ly), ux-lx, uy-ly ) = rhs;
+    }
+    void set_block( int lx, int ux, int ly, int uy, const MaskMatrix<data_type>& rhs )
     {
       DynamicMatrix::block( idx_i(lx), idx_j(ly), ux-lx, uy-ly ) = rhs;
     }

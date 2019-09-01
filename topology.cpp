@@ -40,6 +40,7 @@ Topology::Topology
 
   // DEBUG
   // # # # # #
+  /*
   for (int r = 0; r<size; ++r)
   {
     if (rank==r)
@@ -52,6 +53,7 @@ Topology::Topology
     }
     par_env->barrier();
   }
+  */
   // # # # # #
 
 }

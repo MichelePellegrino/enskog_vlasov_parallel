@@ -19,7 +19,7 @@ ConfigurationReader::read_conf_file
 (void)
 {
 
-  if(par_env->is_root())
+  if( par_env->is_root() )
   {
 
   std::ifstream fs;
@@ -660,6 +660,13 @@ ConfigurationReader::read_conf_file
   ss >> ndom;
   ss.clear(); ss.str(std::string());
 
+  getline (fs, line_buffer);                // # Number of iterations for sampling
+
+  ss << line_buffer;
+  ss.seekg(45);
+  ss >> niter_sampling;
+  ss.clear(); ss.str(std::string());
+
   fs.close();
 
   }
@@ -696,6 +703,9 @@ ConfigurationReader::read_conf_file
   par_env->broadcast(eta_liq0);
   par_env->broadcast(eta_liq1);
 
+  if ( par_env->is_root() )
+    std::cout << " >> npc = " << n_part/(double)(n_cells_x*n_cells_y) << std::endl;
+
   par_env->broadcast(n_part);
   int rem = n_part % par_env->get_size();
   n_part = n_part / par_env->get_size();
@@ -709,6 +719,7 @@ ConfigurationReader::read_conf_file
   par_env->broadcast(delta_t);
 
   par_env->broadcast(niter_thermo);
+  par_env->broadcast(niter_sampling);
   par_env->broadcast(T_ref);
   par_env->broadcast(T_ini);
 

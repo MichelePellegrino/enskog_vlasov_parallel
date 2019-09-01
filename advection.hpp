@@ -33,7 +33,7 @@ public:
   virtual void update_ensemble() = 0;
 };
 
-template <MarchingType dummy_rng_type>
+template <MarchingType dummy_advection_type>
 class TimeMarching : public AbstractTimeMarching
 {
 public:

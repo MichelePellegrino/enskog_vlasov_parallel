@@ -79,7 +79,7 @@
 # YEXTRA (TRONCAMENTO CAMPO MEDIO)=====>     0.2500e01
 # NUMERO CELLE DIR. X =================>....      700
 # NUMERO CELLE DIR. Y =================>....      580
-# NUMERO PARTICELLE LIQUIDO ===========>....  3000000
+# NUMERO PARTICELLE LIQUIDO ===========>....  4060000
 # mean_vel=0 (0) or /=0 (1)  ==========>            1
 # Restart 0 no 1 yes 2 yes mirror  ====>            0
 # vx_ini ==============================>     0.0000e00
@@ -99,4 +99,5 @@
 # Choice for build_I_matrix routine   =>     o
 # Collision statistics off (0) on (1) =>     0
 # Number of subdomains for statistics =>     6
+# Number of iterations for sampling ===>     200
 # **************************** FINE INPUT *************************************

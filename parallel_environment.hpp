@@ -6,11 +6,17 @@
 #include "motherbase.hpp"
 #include "types.hpp"
 
+#ifndef RANK_RNG_OFFSET
 #define RANK_RNG_OFFSET 1000
+#endif
 
+#ifndef MPI_MASTER
 #define MPI_MASTER 0
+#endif
 
+#ifndef MPI_NO_RANK
 #define MPI_NO_RANK -1
+#endif
 
 class DSMC;
 
@@ -50,6 +56,13 @@ public:
   {
     MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, &buffer, count,
       ev_mpi::MPI_Data_convert<data_type>(), communicator);
+  }
+
+  template<class data_type>
+  void all_reduce_inp(data_type& buffer, MPI_Op operation, int count = 1)
+  {
+    MPI_Allreduce(MPI_IN_PLACE, &buffer, count, ev_mpi::MPI_Data_convert<data_type>(),
+      operation, communicator);
   }
 
   template<class data_type>

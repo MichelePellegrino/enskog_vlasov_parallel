@@ -28,11 +28,16 @@ protected:
   DefaultPointer<Topology>& topology;
 
   DefaultPointer<Ensemble>& ensemble;
+  DefaultPointer<Thermostat>& thermostat;
+
   DefaultPointer<DensityKernel>& density;
   DefaultPointer<NondirectionalPairPotential>& potential;
   DefaultPointer<ForceField>& mean_field;
   DefaultPointer<TimeMarching<TM>>& time_marching;
   DefaultPointer<CollisionHandler>& collision_handler;
+
+  DefaultPointer<Sampler>& sampler;
+  DefaultPointer<Output>& output;
 
   CorrelationFun& correlation;
 
@@ -57,12 +62,16 @@ public:
     topology          (dsmc->get_topology()),
 
     ensemble          (dsmc->get_ensemble()),
+    thermostat        (dsmc->get_thermostat()),
 
     density           (dsmc->get_density()),
     potential         (dsmc->get_potential()),
     mean_field        (dsmc->get_mean_field()),
     time_marching     (dsmc->get_time_marching()),
     collision_handler (dsmc->get_collision_handler()),
+
+    sampler           (dsmc->get_sampler()),
+    output            (dsmc->get_output()),
 
     correlation       (dsmc->get_correlation())
 

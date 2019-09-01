@@ -15,18 +15,26 @@ CollisionHandler::CollisionHandler
   size(par_env->get_size()),
   rank(par_env->get_rank()),
 
+  n_fake_store(),
+  n_real_store(),
+  n_total_store(),
+  n_out_store(),
+
   a11( topology->get_idx_lx(rank), topology->get_idx_ux(rank),
-    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0 ),
+    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0.0 ),
 
   vrmax11( topology->get_idx_lx(rank), topology->get_idx_ux(rank),
-    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0 ),
+    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0.0 ),
 
   anew( topology->get_idx_lx(rank), topology->get_idx_ux(rank),
-    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0 ),
+    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0.0 ),
+
+  vrmaxnew( topology->get_idx_lx(rank), topology->get_idx_ux(rank),
+    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0.0 ),
 
   n_coll(0.0),
   n_coll_cell( topology->get_idx_lx(rank), topology->get_idx_ux(rank),
-    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0 ),
+    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0.0 ),
 
   scaled_k( 0.0, 3 ),
   rel_vel( 0.0, 3 ),
@@ -85,6 +93,7 @@ CollisionHandler::compute_majorants
   a11.fill(0.0);
   anew.fill(0.0);
   vrmax11.fill(0.0);
+  vrmaxnew.fill(0.0);
   for (int itest = 0; itest<ntest; itest++)
   {
     idx_p1 = (int)( rng->sample_uniform() * npart );
@@ -106,7 +115,7 @@ CollisionHandler::compute_majorants
         jchk = (int)( (ykh - ymin) * rdy );
         chi11 = correlation( density->get_aveta(ip1,jp1) );
         a11(ip1, jp1) = std::max(a11(ip1, jp1), density->get_numdens(ip1, jp1) * chi11);
-        a11(ichk, jchk) = std::max(a11(ichk, jchk), density->get_numdens(ichk, jchk) * chi11);
+        a11(ick, jck) = std::max(a11(ick, jck), density->get_numdens(ick, jck) * chi11);
         anew(ip1, jp1) = a11(ip1, jp1);
         np2 = density->iof(idx_ck);
         jjp2 = np2 + (int)( rng->sample_uniform() * density->get_npc(ick, jck) );
@@ -118,6 +127,8 @@ CollisionHandler::compute_majorants
         );
         vrmax11(ip1, jp1) = std::max( vrmax11(ip1, jp1), vr );
         vrmax11(ick,jck) = std::max( vrmax11(ick,jck), vr );
+        vrmaxnew(ip1, jp1) = vrmax11(ip1, jp1);
+        vrmaxnew(ick, jck) = vrmax11(ick, jck);
       }
     }
   }
@@ -158,8 +169,6 @@ CollisionHandler::init_cell_ind_map
     n_cells_x[q] = topology->get_quarter_ux(q) - topology->get_quarter_lx(q);
     low_x_quad[q] = topology->get_quarter_lx(q);
     low_y_quad[q] = topology->get_quarter_ly(q);
-    up_x_quad[q] = topology->get_quarter_ux(q);
-    up_y_quad[q] = topology->get_quarter_uy(q);
     cells_ind[q].resize(nc);
     for (int i = 0; i<nc; ++i)
       cells_ind[q][i] = i;
@@ -183,6 +192,7 @@ void
 CollisionHandler::perform_collisions
 (void)
 {
+
   int nc;
   int idx, idx_cell1, i_cell1, j_cell1, idx_p1;
   int idx_cell2, idx_hcell2, i_cell2, j_cell2, idx_p2;
@@ -266,6 +276,8 @@ CollisionHandler::perform_collisions
             rel_vel[1] = ensemble->get_vy(idx_p2) - ensemble->get_vy(idx_p1);
             rel_vel[2] = ensemble->get_vz(idx_p2) - ensemble->get_vz(idx_p1);
             vr = sqrt( rel_vel[0]*rel_vel[0]+rel_vel[1]*rel_vel[1]+rel_vel[2]*rel_vel[2] );
+            vrmaxnew(i_cell1, j_cell1) = std::max( vrmaxnew(i_cell1, j_cell1), vr );
+            vrmaxnew(i_cell2, j_cell2) = std::max( vrmaxnew(i_cell2, j_cell2), vr );
             scalar_prod = rel_vel[0]*scaled_k[0] + rel_vel[1]*scaled_k[1] + rel_vel[2]*scaled_k[2];
             scalar_prod *= sigma;
             aa = density->get_numdens(i_cell2, j_cell2) * correlation(
@@ -326,6 +338,12 @@ CollisionHandler::perform_collisions
     out_bound += parallel_collision_counter.out_bound;
     par_env->barrier();
   }
+
+  n_fake_store.push_back(n_fake);
+  n_real_store.push_back(n_real);
+  n_total_store.push_back(n_total);
+  n_out_store.push_back(out_bound);
+
   // Display statistics
   for (int r = 0; r<size; ++r)
   {
@@ -335,12 +353,15 @@ CollisionHandler::perform_collisions
       // DEBUG
       // # # # # #
       std::cout << "local / communication : " << parallel_counter << " / " << communication_counter << std::endl;
-      std::cout << "density counter = " << null_density_counter << ";\t scalar counter = " << scalar_prod_counter << std::endl;
+      // std::cout << "density counter = " << null_density_counter << ";\t scalar counter = " << scalar_prod_counter << std::endl;
       // # # # # #
       std::cout << "total = " << n_total << "\t real = " << n_real << "\t fake = " << n_fake << "\t out-range = " << out_bound << std::endl;
     }
     par_env->barrier();
   }
+
+  update_majorants();
+
 }
 
 CollisionCounter
@@ -507,6 +528,24 @@ CollisionHandler::perform_parallel_collisions
 }
 
 void
+CollisionHandler::update_majorants
+(void)
+{
+
+  if ( (double)n_fake > alpha_1*(double)n_real )
+  {
+    a11 = anew;
+    vrmax11 = vrmaxnew;
+  }
+  else
+  {
+    a11 = alpha_2*a11;
+    vrmax11 = alpha_2*vrmax11;
+  }
+
+}
+
+void
 CollisionHandler::reset_parallel_buffers
 (void)
 {
@@ -608,4 +647,14 @@ CollisionHandler::test_map_to_domain_collision
         cells_coordinates.insert(p);
     }
   }
+}
+
+void
+CollisionHandler::gather_collisions
+(void)
+{
+  par_env->all_reduce_inp(n_fake_store[0], MPI_SUM, n_fake_store.size());
+  par_env->all_reduce_inp(n_real_store[0], MPI_SUM, n_real_store.size());
+  par_env->all_reduce_inp(n_total_store[0], MPI_SUM, n_total_store.size());
+  par_env->all_reduce_inp(n_out_store[0], MPI_SUM, n_out_store.size());
 }

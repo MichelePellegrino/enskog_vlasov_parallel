@@ -30,9 +30,11 @@ ForceField::ForceField(DSMC* dsmc):
     density->get_num_dens_cell(), 0.0)
 
 {
+
   if(par_env->get_rank()==MPI_MASTER)
     std::cout << "### COMPUTING POTENTIAL KERNEL MATRIX ###" << std::endl;
-  // compute_kernel_matrix();
+  compute_kernel_matrix();
+
 }
 
 void
