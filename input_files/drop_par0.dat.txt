@@ -21,12 +21,12 @@
 #
 # ** STATO FISICO DELLE PARETI          :
 #
-# Temp. iniziale liquido ==============>.... 0.5000e00
-# Temp. iniziale liquido ==============>.... 0.5000e00
+# Temp. iniziale liquido ==============>.... 0.7951e00
+# Temp. iniziale liquido ==============>.... 0.7951e00
 # DENSITA' DELLA PARETE per campo medio>.... 0.7000e00
 # DENSITA' DELLA PARETE per correlazio >.... 0.7000e00
-# DENSITA' DEL GAS     ================>.... 0.6490e-02
-# DENSITA' DEL LIQUIDO ================>.... 0.3763e00
+# DENSITA' DEL GAS     ================>.... 0.3994e-01
+# DENSITA' DEL LIQUIDO ================>.... 0.5917e00
 # Presenza di strato liquido iniziale==>....       13
 # spessore strato liquido iniziale x ==>.... 0.1800e02
 # spessore strato liquido iniziale y ==>.... 0.0000e00

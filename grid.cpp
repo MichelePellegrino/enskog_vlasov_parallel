@@ -91,6 +91,8 @@ Grid::Grid
     // DEBUG
     // # # # # #
     // print_info();
+    if ( par_env->is_root() )
+      std::cout << "### CHECK: n_part/(cell_volume*n_cells) = " << conf->get_n_part()/(cell_volume*n_cells) << std::endl;
     // # # # # #
 
   }

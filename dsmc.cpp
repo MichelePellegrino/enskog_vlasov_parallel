@@ -82,11 +82,11 @@ n_iter_sample ( conf->get_niter_sampling() )
   par_env->barrier();
 
   // TESTING MODULES
-  test_sampling();
-  test_output();
+  // test_sampling();
+  // test_output();
 
   // TESTING LOOP
-  // test_loop(DEFAULT_DUMMY_TEST_ITER);
+  test_loop(DEFAULT_DUMMY_TEST_ITER);
 
 }
 
@@ -184,7 +184,10 @@ DSMC::test_loop
   for (int i = 0; i<n_tests; ++i)
   {
     if ( par_env->is_root() ) std::cout << " >> test iteration: " << i << std::endl;
+    // DEBUG
+    // # # # # #
     test_force_field();
+    // # # # # #
     test_time_marching();
     test_density();
     test_collisions();

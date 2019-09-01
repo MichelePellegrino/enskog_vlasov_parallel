@@ -94,6 +94,10 @@ CollisionHandler::compute_majorants
   anew.fill(0.0);
   vrmax11.fill(0.0);
   vrmaxnew.fill(0.0);
+  // DEBUG
+  // # # # # #
+  // real_number correlation_sum(0.0);
+  // # # # # #
   for (int itest = 0; itest<ntest; itest++)
   {
     idx_p1 = (int)( rng->sample_uniform() * npart );
@@ -114,8 +118,12 @@ CollisionHandler::compute_majorants
         ichk = (int)( (xkh - xmin) * rdx );
         jchk = (int)( (ykh - ymin) * rdy );
         chi11 = correlation( density->get_aveta(ip1,jp1) );
-        a11(ip1, jp1) = std::max(a11(ip1, jp1), density->get_numdens(ip1, jp1) * chi11);
-        a11(ick, jck) = std::max(a11(ick, jck), density->get_numdens(ick, jck) * chi11);
+        // DEBUG
+        // # # # # #
+        // correlation_sum += chi11;
+        // # # # # #
+        a11(ip1, jp1) = std::max( a11(ip1, jp1), density->get_numdens(ip1, jp1) * chi11 );
+        a11(ick, jck) = std::max( a11(ick, jck), density->get_numdens(ick, jck) * chi11 );
         anew(ip1, jp1) = a11(ip1, jp1);
         np2 = density->iof(idx_ck);
         jjp2 = np2 + (int)( rng->sample_uniform() * density->get_npc(ick, jck) );
@@ -135,6 +143,7 @@ CollisionHandler::compute_majorants
   // DEBUG
   // # # # # #
   // print_reduced_constants();
+  // std::cout << "rank " << rank << " : correlation_sum = " << correlation_sum << std::endl;
   // # # # # #
 }
 
