@@ -86,6 +86,8 @@ n_iter_sample ( conf->get_niter_sampling() )
   // test_output();
 
   // TESTING LOOP
+  // Apparently, there are issues with the parallel collisions;
+  // let us test streaming and mean field, for now
   test_loop(DEFAULT_DUMMY_TEST_ITER);
 
 }
@@ -184,14 +186,14 @@ DSMC::test_loop
   for (int i = 0; i<n_tests; ++i)
   {
     if ( par_env->is_root() ) std::cout << " >> test iteration: " << i << std::endl;
+    test_force_field();
+    test_time_marching();
+    test_thermostat();
+    test_density();
     // DEBUG
     // # # # # #
-    test_force_field();
+    // test_collisions();
     // # # # # #
-    test_time_marching();
-    test_density();
-    test_collisions();
-    test_thermostat();
     test_sampling();
   }
   collision_handler->gather_collisions();
@@ -230,6 +232,7 @@ DSMC::output_all_samples
   if ( par_env->is_root() )
   {
     std::cout << "### OUTPUT ALL SAMPLES ###" << std::endl;
+    /*
     output->output_sample(sampler->get_vx_avg(), "output_files/samples/test_sample_vx.txt");
     output->output_sample(sampler->get_vy_avg(), "output_files/samples/test_sample_vy.txt");
     output->output_sample(sampler->get_vz_avg(), "output_files/samples/test_sample_vz.txt");
@@ -243,6 +246,7 @@ DSMC::output_all_samples
     output->output_sample(sampler->get_qx_avg(), "output_files/samples/test_sample_qx.txt");
     output->output_sample(sampler->get_qy_avg(), "output_files/samples/test_sample_qy.txt");
     output->output_sample(sampler->get_qz_avg(), "output_files/samples/test_sample_qz.txt");
+    */
     output->output_sample(sampler->get_numdens_avg(), "output_files/samples/test_sample_numdens.txt");
   }
 }
@@ -254,6 +258,7 @@ DSMC::output_all_samples
   if ( par_env->is_root() )
   {
     std::cout << "### OUTPUT ALL SAMPLES ###" << std::endl;
+    /*
     output->output_sample(sampler->get_vx_avg(), "output_files/samples/test_sample_vx", t);
     output->output_sample(sampler->get_vy_avg(), "output_files/samples/test_sample_vy", t);
     output->output_sample(sampler->get_vz_avg(), "output_files/samples/test_sample_vz", t);
@@ -267,6 +272,7 @@ DSMC::output_all_samples
     output->output_sample(sampler->get_qx_avg(), "output_files/samples/test_sample_qx", t);
     output->output_sample(sampler->get_qy_avg(), "output_files/samples/test_sample_qy", t);
     output->output_sample(sampler->get_qz_avg(), "output_files/samples/test_sample_qz", t);
+    */
     output->output_sample(sampler->get_numdens_avg(), "output_files/samples/test_sample_numdens", t);
   }
 }
