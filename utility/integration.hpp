@@ -35,23 +35,26 @@ template<>
 class NumericalIntegrator<Finite>
 {
 private:
-  std::function<real_number(real_number)> func;
+  typedef std::function<real_number(real_number)> FunType;
+  FunType func;
   real_number a, b;
   real_number eps;
+  Midpnt<FunType> quadrature;
 public:
   NumericalIntegrator() = default;
   NumericalIntegrator
-  (std::function<real_number(real_number)> FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS):
-    func(FUN), a(A), b(B), eps(EPS) { }
+  (FunType FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS):
+    func(FUN), a(A), b(B), eps(EPS), quadrature(FUN, A, B) { }
   real_number integrate ( void )
   {
-    return qromb(func, a, b, eps);
+    return qromo(quadrature, eps);
   }
   real_number integrate
-  (std::function<real_number(real_number)> FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS)
+  (FunType FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS)
   {
-    a = A; b = B;
-    return qromb(func, a, b, eps);
+    a = A; b = B, eps = EPS;
+    Midpnt<FunType> new_quadrature(FUN, A, B);
+    return qromo(new_quadrature, eps);
   }
   ~NumericalIntegrator() = default;
 };
@@ -61,26 +64,43 @@ template<>
 class NumericalIntegrator<Infinite>
 {
 private:
-  std::function<real_number(real_number)> func;                                 // integrand for finite integral
-  std::function<real_number(real_number)> funk                                  // integrand for infinite integral
-    = [this](real_number x) { return func(1.0/x)/(x*x); };
+  typedef std::function<real_number(real_number)> FunType;
+  FunType func;                                 // integrand for finite integral
+  // FunType funk = [this](real_number x) { return func(1.0/x)/(x*x); };
   real_number a, b;
   real_number eps;
+  Midinf<FunType> quadrature;
 public:
   NumericalIntegrator() = default;
+  /*
   NumericalIntegrator
-  (std::function<real_number(real_number)> FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS):
+  (FunType FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS):
     func(FUN), a(1.0/B), b(1.0/A), eps(EPS) { }
   real_number integrate ( void )
   {
     return qromb(funk, a, b, eps);
   }
   real_number integrate
-  (std::function<real_number(real_number)> FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS)
+  (FunType FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS)
   {
     a = 1.0/B;
     b = 1.0/A;
     return qromb(funk, a, b, eps);
+  }
+  */
+  NumericalIntegrator
+  (FunType FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS):
+    func(FUN), a(A), b(A), eps(EPS), quadrature(FUN,A,B) { }
+  real_number integrate ( void )
+  {
+    return qromo(quadrature, eps);
+  }
+  real_number integrate
+  (FunType FUN, real_number A, real_number B, real_number EPS = DEFAULT_EPS)
+  {
+    a = A; b = B, eps = EPS;
+    Midinf<FunType> new_quadrature(FUN, A, B);
+    return qromo(new_quadrature, eps);
   }
   ~NumericalIntegrator() = default;
 };

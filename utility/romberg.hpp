@@ -11,12 +11,24 @@
 #define MIN std::min
 #define MAX std::max
 
-#define ITERMAX 25
-#define MULT_STEP 0.25
+#ifndef ITERMAX
+#define ITERMAX 20
+#endif
+
+#ifndef MULT_STEP
+#define MULT_STEP (1.0/9.0)
+#endif
+
+#ifndef ORDER_K
+#define ORDER_K 5
+#endif
 
 typedef const VecDoub VecDoub_I;
 
-// INTERPOLATION
+
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+// # # # INTERPOLATION # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 struct Poly_interp
 {
@@ -148,12 +160,84 @@ struct Poly_interp
 
 };
 
-// QUADRATURE
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+// # # # QUADRATURE  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 struct Quadrature
 {
   Int n;
   virtual Doub next() = 0;
+};
+
+template <class T>
+struct Midpnt : Quadrature
+{
+  //Routine implementing the extended midpoint rule.
+  Doub a,b,s;   // Limits of integration and current value of inte-
+  T &funk;      // gral.
+  Midpnt(T &funcc, const Doub aa, const Doub bb) :
+    funk(funcc), a(aa), b(bb) { n=0; }
+  // The constructor takes as inputs func, the function or functor to be integrated between
+  // limits a and b, also input.
+  Doub next()
+  {
+  Int it,j;
+    Doub x,tnm,sum,del,ddel;
+    n++;
+    if (n == 1)
+    {
+        return (s=(b-a)*func(0.5*(a+b)));
+    }
+    else
+    {
+      for(it=1,j=1;j<n-1;j++) it *= 3;
+      tnm=it;
+      del=(b-a)/(3.0*tnm);
+      ddel=del+del;
+      x=a+0.5*del;
+      sum=0.0;
+      for (j=0;j<it;j++)
+      {
+        sum += func(x);
+        x += ddel;
+        sum += func(x);
+        x += del;
+      }
+      s=(s+(b-a)*sum/tnm)/3.0;
+      return s;
+    }
+  }
+  // The added points alternate in spacing be- tween del and ddel.
+  // The new sum is combined with the old inte- gral to give a refined integral.
+  virtual Doub func(const Doub x)
+  {
+    return funk(x);
+  }
+};
+
+template <class T>
+struct Midinf : Midpnt<T>
+{
+  // This routine is an exact replacement for midpnt, i.e., returns the nth stage
+  // of refinement of the integral of funcc from aa to bb, except that the
+  // function is evaluated at evenly spaced points in 1=x rather than in x. This
+  // allows the upper limit bb to be as large and positive as the computer allows,
+  // or the lower limit aa to be as large and negative, but not both. aa and bb
+  // must have the same sign.
+  Doub func(const Doub x)
+  {
+    return Midpnt<T>::funk(1.0/x)/(x*x);
+  }
+  Midinf(T &funcc, const Doub aa, const Doub bb) :
+    Midpnt<T>(funcc, aa, bb)
+    {
+      Midpnt<T>::a = 1.0/bb;
+      Midpnt<T>::b = 1.0/aa;
+    }
 };
 
 template<class T>
@@ -186,12 +270,17 @@ struct Trapzd : Quadrature
   }
 };
 
-// ROMBERG TEMPLATE CLASS
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+// # # # ROMBERG TEMPLATE CLASS  # # # # # # # # # # # # # # # # # # # # # # # #
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 template <class T>
 Doub qromb(T &func, Doub a, Doub b, const Doub eps=1.0e-10)
 {
-  const Int JMAX=ITERMAX, JMAXP=JMAX+1, K=5;
+  const Int JMAX=ITERMAX, JMAXP=JMAX+1, K=ORDER_K;
   VecDoub s(JMAX), h(JMAXP);
   Poly_interp polint(h,s,K);
   h[0]=1.0;
@@ -210,5 +299,30 @@ Doub qromb(T &func, Doub a, Doub b, const Doub eps=1.0e-10)
   // std::cout << "WARNING: Too many steps in routine qromb" << std::endl;
   return ss;
 }
+
+template<class T>
+Doub qromo(Midpnt<T> &q, const Doub eps=3.0e-9)
+{
+  const Int JMAX=ITERMAX, JMAXP=JMAX+1, K=ORDER_K;
+  VecDoub h(JMAXP), s(JMAX);
+  Poly_interp polint(h,s,K);
+  h[0]=1.0;
+  Doub ss = 0.0;
+  for (Int j=1;j<=JMAX;j++)
+  {
+    s[j-1]=q.next();
+    if (j >= K)
+    {
+      ss=polint.rawinterp(j-K,0.0);
+      if (abs(polint.dy) <= eps*abs(ss)) return ss;
+    }
+    h[j]=MULT_STEP*h[j-1];
+  }
+  std::cout << "WARNING: Too many steps in routine qromb" << std::endl;
+  return ss;
+}
+
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+// # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 #endif /* ROMBERG_HPP */
