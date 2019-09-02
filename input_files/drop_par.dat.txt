@@ -90,7 +90,7 @@
 # TIM =================================>     2.0000e02
 # Numero intervalli tra tim e tmax ====>           1
 # Partenza del contatore per intervalli>           0
-# DELTAT ==============================>     0.1000e-02
+# DELTAT ==============================>     0.1000e-00
 # Qwrite                                            0
 # SEME  ===============================>           76
 # NUMERO NODI VELOCITA' FUNZ. DISTR. ==>          100

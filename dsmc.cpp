@@ -186,7 +186,10 @@ DSMC::test_loop
   for (int i = 0; i<n_tests; ++i)
   {
     if ( par_env->is_root() ) std::cout << " >> test iteration: " << i << std::endl;
-    test_force_field();
+    // DEBUG
+    // # # # # #
+    // test_force_field();
+    // # # # # #
     test_time_marching();
     test_thermostat();
     test_density();

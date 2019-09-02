@@ -25,6 +25,7 @@ source /u/sw/etc/profile
 module load gcc-glibc
 cd /fast-scratch/mpellegrino/dsmc_parallel
 mkdir output_files
+mkdir output_files/samples
 
 # time /home/matematica/barbante/non_ideal_fluid/Programmi/ev_pist_3b.exe &> out
 mpirun -np 4 /home/matematica/mpellegrino/enskog_vlasov/enskog_vlasov_parallel/main &> main.log
