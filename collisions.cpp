@@ -204,7 +204,7 @@ CollisionHandler::perform_collisions
 
   int nc;
   int idx, idx_cell1, i_cell1, j_cell1, idx_p1;
-  int idx_cell2, idx_hcell2, i_cell2, j_cell2, idx_p2;
+  int idx_cell2, idx_hcell2, i_cell2, j_cell2, i_hcell2, j_hcell2, idx_p2;
   int i_cell1_quad, j_cell1_quad;
   int rank_coll_part;
   real_number xk, yk, xkh, ykh, aa, fk;
@@ -263,8 +263,15 @@ CollisionHandler::perform_collisions
         i_cell2 = (int)( (xk-xmin)*rdx );
         j_cell2 = (int)( (yk-ymin)*rdy );
         idx_cell2 = grid->lexico(i_cell2, j_cell2);
-        idx_hcell2 = grid->lexico( (int)((xkh-xmin)*rdx), (int)((ykh-ymin)*rdy) );
-        rank_coll_part = topology->get_topology_map(i_cell2,j_cell2);
+        // For DEBUG reasons: it doesn't consider minimum-image convention:
+        // # # # # #
+        // i_hcell2 = (int)( (xkh-xmin)*rdx );
+        // j_hcell2 = (int)( (ykh-ymin)*rdy );
+        i_hcell2 = ( i_cell2 + i_cell1 ) / 2;
+        j_hcell2 = ( j_cell2 + j_cell1 ) / 2;
+        // # # # # #
+        idx_hcell2 = grid->lexico(i_hcell2, j_hcell2);
+        rank_coll_part = topology->get_topology_map(i_cell2, j_cell2);
         if ( rank_coll_part == rank )
         {
           // DEBUG
@@ -289,6 +296,15 @@ CollisionHandler::perform_collisions
             vrmaxnew(i_cell2, j_cell2) = std::max( vrmaxnew(i_cell2, j_cell2), vr );
             scalar_prod = rel_vel[0]*scaled_k[0] + rel_vel[1]*scaled_k[1] + rel_vel[2]*scaled_k[2];
             scalar_prod *= sigma;
+            // DEBUG -> PROBLEM TO BE SOLVED !!!!!
+            // # # # # #
+            if ( topology->get_topology_map(i_hcell2, j_hcell2) != rank )
+            {
+              std::cout << "(" << i_cell1 << "," << j_cell1 << ")" << std::endl;
+              std::cout << "(" << i_hcell2 << "," << j_hcell2 << ")" << std::endl;
+              std::cout << "(" << i_cell2 << "," << j_cell2 << ")" << std::endl;
+            }
+            // # # # # #
             aa = density->get_numdens(i_cell2, j_cell2) * correlation(
               density->get_aveta(grid->lexico_inv(idx_hcell2).first, grid->lexico_inv(idx_hcell2).second) );
             anew(i_cell1, j_cell1) = std::max( anew(i_cell1, j_cell1), aa );

@@ -26,7 +26,7 @@
 #endif
 
 #ifndef DEFAULT_DUMMY_TEST_ITER
-#define DEFAULT_DUMMY_TEST_ITER 1
+#define DEFAULT_DUMMY_TEST_ITER 10
 #endif
 
 #define DENSITY_TAG   0

@@ -26,18 +26,20 @@ Grid::Grid
   rdx(1.0/dx),
   rdy(1.0/dy),
   xc(n_cells_x),
-  yc(n_cells_y)
+  yc(n_cells_y),
+  channel_section(conf->get_channel_section()),
+  cell_volume(conf->get_cell_volume())
   {
 
     // Coerence check x1
     if ( boundary->get_pct().find(boundary->get_wall_condition()[0]) == boundary->get_pct().end() )
     {
-      assert(x_min==boundary->get_Lx1() && "In case of logical b.c. x_min and Lx1 have to be the same");
+      assert(x_min==-boundary->get_Lx1() && "In case of logical b.c. x_min and Lx1 have to be the same");
       x_lim_m = -boundary->get_Lx1();
     }
     else
     {
-      assert(x_min!=boundary->get_Lx1() && "In case of physical b.c. x_min and Lx1 can't be equal");
+      assert(x_min!=-boundary->get_Lx1() && "In case of physical b.c. x_min and Lx1 can't be equal");
       x_lim_m = -(boundary->get_Lx1() - species->get_diam_gw());
     }
     // Coerence check x2
@@ -54,12 +56,12 @@ Grid::Grid
     // Coerence check y1
     if ( boundary->get_pct().find(boundary->get_wall_condition()[1]) == boundary->get_pct().end() )
     {
-      assert(y_min==boundary->get_Ly1() && "In case of logical b.c. x_min and Ly1 have to be the same");
+      assert(y_min==-boundary->get_Ly1() && "In case of logical b.c. x_min and Ly1 have to be the same");
       y_lim_m = -boundary->get_Ly1();
     }
     else
     {
-      assert(y_min!=boundary->get_Ly1() && "In case of physical b.c. x_min and Ly1 can't be equal");
+      assert(y_min!=-boundary->get_Ly1() && "In case of physical b.c. x_min and Ly1 can't be equal");
       y_lim_m = -(boundary->get_Ly1() - species->get_diam_gw());
     }
     // Coerence check y2
@@ -73,28 +75,9 @@ Grid::Grid
       assert(y_max!=boundary->get_Ly2() && "In case of physical b.c. x_min and Ly2 can't be equal");
       y_lim_p = boundary->get_Ly2() - species->get_diam_gw();
     }
-    // Set cell volume (basic case)
-    /* TEMP: */
-    // real_number channel_area = (x_lim_p-x_lim_m) * (y_lim_p-y_lim_m);
-    real_number channel_area = (x_max-x_min) * (y_max-y_min);
-    real_number dg = species->get_diam_fluid();
-    /* TEMP: */
-    real_number homogeneous_density = 6.0 * conf->get_eta_liq0() / (ev_const::pi * dg*dg*dg);
-    // real_number homogeneous_density = 6.0 * conf->get_eta_liq1() / (ev_const::pi * dg*dg*dg);
-    real_number channel_volume = conf->get_n_part() / homogeneous_density;
-    channel_section = channel_volume / channel_area;
-    cell_volume = dx*dy*channel_section;
     // Initialize centroids
     for ( int i = 0; i < n_cells_x; ++i)  xc[i] = x_min + ( i+0.5 ) * dx;
     for ( int j = 0; j < n_cells_y; ++j)  yc[j] = y_min + ( j+0.5 ) * dy;
-
-    // DEBUG
-    // # # # # #
-    // print_info();
-    if ( par_env->is_root() )
-      std::cout << "### CHECK: n_part/(cell_volume*n_cells) = " << conf->get_n_part()/(cell_volume*n_cells) << std::endl;
-    // # # # # #
-
   }
 
 

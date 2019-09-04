@@ -13,7 +13,7 @@
 #endif
 
 #ifndef DEFAULT_TOPOLOGY
-#define DEFAULT_TOPOLOGY StripesX
+#define DEFAULT_TOPOLOGY Quadrants
 #endif
 
 using namespace ev_matrix;

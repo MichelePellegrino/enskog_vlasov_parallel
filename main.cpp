@@ -7,7 +7,7 @@ MPI_Init(nullptr, nullptr);
 
 try
 {
-  DSMC my_dsmc_instanziation("input_files/drop_par0.dat.txt");
+  DSMC my_dsmc_instanziation("input_files/uniform02.dat.txt");
 }
 catch(const char* ex)
 {
