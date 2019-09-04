@@ -105,6 +105,16 @@ private:
   int ndom;                                 // ORIGINAL: ndom	(number of subdomains for statistics)
   int niter_sampling;                       // No. iterations for sampling
 
+  // Derived quantities
+  real_number dx, dy;
+
+  // Initial configuration
+  real_number channel_area, channel_area0, channel_area1;
+  real_number homogeneous_density, homogeneous_density0, homogeneous_density1;
+  real_number channel_volume, channel_volume0, channel_volume1;
+  real_number channel_section, cell_volume;
+  int npart0, npart1;
+
 public:
 
   ConfigurationReader(DSMC*, const DefaultString&);
@@ -119,6 +129,10 @@ public:
   inline int get_L_y_2() const { return L_y_2; }
   inline const std::array<char, 4>& get_wall_cond() const { return wall_cond; }
   inline const std::array<real_number, 4>& get_p_e() const { return p_e; }
+
+  inline int get_liq_interf() const { return liq_interf; }
+  inline real_number get_x_liq_interf() const { return x_liq_interf; }
+  inline real_number get_y_liq_interf() const { return y_liq_interf; }
 
   inline real_number get_diam_fluid() { return diam_fluid; }
   inline real_number get_diam_solid() { return diam_solid; }
@@ -153,9 +167,28 @@ public:
   inline real_number get_T_ref() const { return T_ref; }
   inline real_number get_T_ini() const { return T_ini; }
 
+  inline real_number get_dx() const { return dx; }
+  inline real_number get_dy() const { return dy; }
+
+  // Initial configuration
+  inline real_number get_channel_area() const { return channel_area; }
+  inline real_number get_channel_area0() const { return channel_area0; }
+  inline real_number get_channel_area1() const { return channel_area1; }
+  inline real_number get_homogeneous_density() const { return homogeneous_density; }
+  inline real_number get_homogeneous_density0() const { return homogeneous_density0; }
+  inline real_number get_homogeneous_density1() const { return homogeneous_density1; }
+  inline real_number get_channel_volume() const { return channel_volume; }
+  inline real_number get_channel_volume0() const { return channel_volume0; }
+  inline real_number get_channel_volume1() const { return channel_volume1; }
+  inline real_number get_channel_section() const { return channel_section; }
+  inline real_number get_cell_volume() const { return cell_volume; }
+  inline int get_npart0() const { return npart0; }
+  inline int get_npart1() const { return npart1; }
+
 private:
 
   void read_conf_file( void );
+  void setup_initial_configuration( void );
 
 };
 

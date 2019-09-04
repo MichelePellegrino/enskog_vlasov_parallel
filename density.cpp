@@ -19,8 +19,8 @@ DensityKernel::DensityKernel
 
   reduce_factor( ( ev_const::pi/6.0 ) * ev_utility::power<3>(species->get_diam_fluid()) ),
 
-  ns_x( (int)( species->get_hdiam_fluid() / ( grid->get_dx() * ev_const::sqrt2) ) ),
-  ns_y( (int)( species->get_hdiam_fluid() / ( grid->get_dy() * ev_const::sqrt2) ) ),
+  ns_x( (int)( species->get_hdiam_fluid() / ( conf->get_dx() * ev_const::sqrt2) ) ),
+  ns_y( (int)( species->get_hdiam_fluid() / ( conf->get_dy() * ev_const::sqrt2) ) ),
 
   stencil_x(ns_x, ns_y, 0.0),
   stencil_y(ns_x, ns_y, 0.0),
@@ -29,8 +29,8 @@ DensityKernel::DensityKernel
   x_min(grid->get_x_min()),
   y_min(grid->get_y_min()),
 
-  n_cutoff_x( (int)(conf->get_x_extra()/grid->get_dx())+1 ),
-  n_cutoff_y( (int)(conf->get_x_extra()/grid->get_dx())+1 ),
+  n_cutoff_x( (int)(conf->get_x_extra()/conf->get_dx())+1 ),
+  n_cutoff_y( (int)(conf->get_x_extra()/conf->get_dx())+1 ),
 
   n_part_cell( topology->get_idx_lx(par_env->get_rank()), topology->get_idx_ux(par_env->get_rank()),
     topology->get_idx_ly(par_env->get_rank()), topology->get_idx_uy(par_env->get_rank()), 0 ),
@@ -64,8 +64,8 @@ DensityKernel::DensityKernel
     // Initialize weight
     if (par_env->get_rank()==MPI_MASTER)
     {
-      real_number dx = grid->get_dx();
-      real_number dy = grid->get_dy();
+      real_number dx = conf->get_dx();
+      real_number dy = conf->get_dy();
       real_number sigma = species->get_diam_fluid();
       real_number hsigma = sigma/2.0;
       real_number sum_w = 0.0;

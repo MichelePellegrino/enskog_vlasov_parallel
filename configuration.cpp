@@ -11,8 +11,8 @@ Motherbase(dsmc), conf_file_name(file_name)
 {
   par_env->barrier();
   read_conf_file();
+  setup_initial_configuration();
 }
-
 
 void
 ConfigurationReader::read_conf_file
@@ -700,6 +700,10 @@ ConfigurationReader::read_conf_file
   par_env->broadcast(x_extra);
   par_env->broadcast(y_extra);
 
+  par_env->broadcast(liq_interf);
+  par_env->broadcast(x_liq_interf);
+  par_env->broadcast(y_liq_interf);
+
   par_env->broadcast(eta_liq0);
   par_env->broadcast(eta_liq1);
 
@@ -723,4 +727,66 @@ ConfigurationReader::read_conf_file
   par_env->broadcast(T_ref);
   par_env->broadcast(T_ini);
 
+  dx = (double)(x_max+x_min) / (double)n_cells_x;
+  dy = (double)(y_max+y_min) / (double)n_cells_y;
+
+}
+
+void
+ConfigurationReader::setup_initial_configuration
+(void)
+{
+
+  if ( par_env->is_root() )
+    std::cout << "### SETTING-UP INITIAL CONFIGURATION ###" << std::endl;
+
+  real_number tmp0, tmp1;
+  switch( liq_interf )
+  {
+    case 0:     /* Uniform phase */
+      if ( par_env->is_root() )
+        std::cout << "### CASE: uniform single phase ###" << std::endl;
+      // real_number channel_area = (x_lim_p-x_lim_m) * (y_lim_p-y_lim_m);
+      channel_area = (x_max+x_min) * (y_max+y_min);
+      homogeneous_density = 6.0 * eta_liq0 / (ev_const::pi * diam_fluid*diam_fluid*diam_fluid);
+      channel_volume = n_part / homogeneous_density;
+      channel_section = channel_volume / channel_area;
+      cell_volume = dx*dy*channel_section;
+      npart0 = n_part;  npart1 = 0;
+      break;
+    case 5:     /* Initial liquid layer in the middle, parallel to the x axis */
+      if ( par_env->is_root() )
+       std::cout << "### CASE: initial liquid layer in the middle (parallel to the x axis) ###" << std::endl;
+      channel_area0 = (x_max+x_min) * (y_max+y_min-y_liq_interf);
+      channel_area1 = (x_max+x_min) * y_liq_interf;
+      homogeneous_density0 = 6.0 * eta_liq0 / (ev_const::pi * diam_fluid*diam_fluid*diam_fluid);
+      homogeneous_density1 = 6.0 * eta_liq1 / (ev_const::pi * diam_fluid*diam_fluid*diam_fluid);
+      tmp0 = 1.0/(homogeneous_density0*channel_area0);
+      tmp1 = 1.0/(homogeneous_density1*channel_area1);
+      npart1 = (int)(n_part*tmp0/(tmp0+tmp1));
+      npart0 = n_part - npart1;
+      channel_volume0 = npart0 / homogeneous_density0;
+      channel_volume1 = npart1 / homogeneous_density1;
+      channel_section = (channel_volume0+channel_volume1) / (channel_area0+channel_area1);
+      cell_volume = dx*dy*channel_section;
+      break;
+    case 6:     /* Initial liquid layer in the middle, parallel to the y axis */
+      if ( par_env->is_root() )
+        std::cout << "### CASE: initial liquid layer in the middle (parallel to the y axis) ###" << std::endl;
+      channel_area0 = (x_max+x_min-x_liq_interf) * (y_max+y_min);
+      channel_area1 = x_liq_interf * (y_max+y_min);
+      homogeneous_density0 = 6.0 * eta_liq0 / (ev_const::pi * diam_fluid*diam_fluid*diam_fluid);
+      homogeneous_density1 = 6.0 * eta_liq1 / (ev_const::pi * diam_fluid*diam_fluid*diam_fluid);
+      tmp0 = 1.0/(homogeneous_density0*channel_area0);
+      tmp1 = 1.0/(homogeneous_density1*channel_area1);
+      npart1 = (int)(n_part*tmp0/(tmp0+tmp1));
+      npart0 = n_part - npart1;
+      channel_volume0 = npart0 / homogeneous_density0;
+      channel_volume1 = npart1 / homogeneous_density1;
+      channel_section = (channel_volume0+channel_volume1) / (channel_area0+channel_area1);
+      cell_volume = dx*dy*channel_section;
+      break;
+    default:
+      std::cerr << "Unrecognized configuration" << std::endl;
+  }
 }

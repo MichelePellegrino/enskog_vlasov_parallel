@@ -15,6 +15,7 @@ private:
 
   ev_matrix::MaskMatrix<int> inner_counter;
   ev_matrix::MaskMatrix<real_number> inner_counter_cast;
+  ev_matrix::MaskMatrix<real_number> dt_factor;
 
   // LOCAL QUANTITIES
   ev_matrix::MaskMatrix<real_number> vx_avg;
@@ -31,6 +32,8 @@ private:
   ev_matrix::MaskMatrix<real_number> qy_avg;
   ev_matrix::MaskMatrix<real_number> qz_avg;
   ev_matrix::MaskMatrix<real_number> numdens_avg;
+  ev_matrix::MaskMatrix<real_number> fx_avg;
+  ev_matrix::MaskMatrix<real_number> fy_avg;
 
   // GLOBAL QUANTITIES
   ev_matrix::MaskMatrix<real_number> global_vx_avg;
@@ -47,6 +50,8 @@ private:
   ev_matrix::MaskMatrix<real_number> global_qy_avg;
   ev_matrix::MaskMatrix<real_number> global_qz_avg;
   ev_matrix::MaskMatrix<real_number> global_numdens_avg;
+  ev_matrix::MaskMatrix<real_number> global_fx_avg;
+  ev_matrix::MaskMatrix<real_number> global_fy_avg;
 
   int n_cells_x;
   int low_x, low_y;
@@ -108,6 +113,12 @@ public:
 
   inline const ev_matrix::MaskMatrix<real_number>& get_numdens_avg(void) const { return global_numdens_avg; }
   inline ev_matrix::MaskMatrix<real_number>& get_numdens_avg(void) { return global_numdens_avg; }
+
+  inline const ev_matrix::MaskMatrix<real_number>& get_forces_x_avg(void) const { return global_fx_avg; }
+  inline ev_matrix::MaskMatrix<real_number>& get_forces_x_avg(void) { return global_fx_avg; }
+
+  inline const ev_matrix::MaskMatrix<real_number>& get_forces_y_avg(void) const { return global_fy_avg; }
+  inline ev_matrix::MaskMatrix<real_number>& get_forces_y_avg(void) { return global_fy_avg; }
 
 };
 

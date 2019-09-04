@@ -188,14 +188,13 @@ DSMC::test_loop
     if ( par_env->is_root() ) std::cout << " >> test iteration: " << i << std::endl;
     // DEBUG
     // # # # # #
-    // test_force_field();
-    // # # # # #
+    /*
+    test_force_field();
     test_time_marching();
     test_thermostat();
     test_density();
-    // DEBUG
-    // # # # # #
-    // test_collisions();
+    test_collisions();
+    */
     // # # # # #
     test_sampling();
   }
@@ -235,21 +234,7 @@ DSMC::output_all_samples
   if ( par_env->is_root() )
   {
     std::cout << "### OUTPUT ALL SAMPLES ###" << std::endl;
-    /*
-    output->output_sample(sampler->get_vx_avg(), "output_files/samples/test_sample_vx.txt");
-    output->output_sample(sampler->get_vy_avg(), "output_files/samples/test_sample_vy.txt");
-    output->output_sample(sampler->get_vz_avg(), "output_files/samples/test_sample_vz.txt");
-    output->output_sample(sampler->get_temp_avg(), "output_files/samples/test_temp_avg.txt");
-    output->output_sample(sampler->get_pxx_avg(), "output_files/samples/test_sample_pxx.txt");
-    output->output_sample(sampler->get_pyy_avg(), "output_files/samples/test_sample_pyy.txt");
-    output->output_sample(sampler->get_pzz_avg(), "output_files/samples/test_sample_pzz.txt");
-    output->output_sample(sampler->get_pxy_avg(), "output_files/samples/test_sample_pxy.txt");
-    output->output_sample(sampler->get_pxz_avg(), "output_files/samples/test_sample_pxz.txt");
-    output->output_sample(sampler->get_pyz_avg(), "output_files/samples/test_sample_pyz.txt");
-    output->output_sample(sampler->get_qx_avg(), "output_files/samples/test_sample_qx.txt");
-    output->output_sample(sampler->get_qy_avg(), "output_files/samples/test_sample_qy.txt");
-    output->output_sample(sampler->get_qz_avg(), "output_files/samples/test_sample_qz.txt");
-    */
+    // ...
     output->output_sample(sampler->get_numdens_avg(), "output_files/samples/test_sample_numdens.txt");
   }
 }
@@ -261,21 +246,7 @@ DSMC::output_all_samples
   if ( par_env->is_root() )
   {
     std::cout << "### OUTPUT ALL SAMPLES ###" << std::endl;
-    /*
-    output->output_sample(sampler->get_vx_avg(), "output_files/samples/test_sample_vx", t);
-    output->output_sample(sampler->get_vy_avg(), "output_files/samples/test_sample_vy", t);
-    output->output_sample(sampler->get_vz_avg(), "output_files/samples/test_sample_vz", t);
-    output->output_sample(sampler->get_temp_avg(), "output_files/samples/test_temp_avg", t);
-    output->output_sample(sampler->get_pxx_avg(), "output_files/samples/test_sample_pxx", t);
-    output->output_sample(sampler->get_pyy_avg(), "output_files/samples/test_sample_pyy", t);
-    output->output_sample(sampler->get_pzz_avg(), "output_files/samples/test_sample_pzz", t);
-    output->output_sample(sampler->get_pxy_avg(), "output_files/samples/test_sample_pxy", t);
-    output->output_sample(sampler->get_pxz_avg(), "output_files/samples/test_sample_pxz", t);
-    output->output_sample(sampler->get_pyz_avg(), "output_files/samples/test_sample_pyz", t);
-    output->output_sample(sampler->get_qx_avg(), "output_files/samples/test_sample_qx", t);
-    output->output_sample(sampler->get_qy_avg(), "output_files/samples/test_sample_qy", t);
-    output->output_sample(sampler->get_qz_avg(), "output_files/samples/test_sample_qz", t);
-    */
+    // ...
     output->output_sample(sampler->get_numdens_avg(), "output_files/samples/test_sample_numdens", t);
   }
 }
