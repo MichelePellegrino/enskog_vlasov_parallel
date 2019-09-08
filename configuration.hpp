@@ -113,6 +113,7 @@ private:
   real_number homogeneous_density, homogeneous_density0, homogeneous_density1;
   real_number channel_volume, channel_volume0, channel_volume1;
   real_number channel_section, cell_volume;
+  int npart_global;
   int npart0, npart1;
 
 public:

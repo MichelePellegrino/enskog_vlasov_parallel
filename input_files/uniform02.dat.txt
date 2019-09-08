@@ -25,7 +25,7 @@
 # Temp. iniziale liquido ==============>.... 0.7000e00
 # DENSITA' DELLA PARETE per campo medio>.... 0.7000e00
 # DENSITA' DELLA PARETE per correlazio >.... 0.7000e00
-# DENSITA' DEL GAS     ================>.... 0.5581e-01
+# DENSITA' DEL GAS     ================>.... 0.2284e00
 # DENSITA' DEL LIQUIDO ================>.... 0.0000e00
 # Presenza di strato liquido iniziale==>....       0
 # spessore strato liquido iniziale x ==>.... 0.0000e00

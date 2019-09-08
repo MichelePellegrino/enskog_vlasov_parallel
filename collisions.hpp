@@ -57,6 +57,7 @@ private:
   int n_fake = 0;
   int n_real = 0;
   int n_total = 0;
+  int out_bound = 0;
 
   // Vectors for storage
   std::vector<int> n_fake_store;

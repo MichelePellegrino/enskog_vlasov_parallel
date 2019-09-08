@@ -40,18 +40,7 @@ Topology::Topology
 
   // DEBUG
   // # # # # #
-  for (int r = 0; r<size; ++r)
-  {
-    if (rank==r)
-    {
-      std::cout << " >> Rank " << r << " has limits: ["<<idx_lx_rank<<","<<idx_ux_rank<<";"<<idx_ly_rank<<","<<idx_uy_rank<<"]" << std::endl;
-      std::cout << "   quarters: ["<<quarter_lx[0]<<","<<quarter_ux[0]<<";"<<quarter_ly[0]<<","<<quarter_uy[0]<<"]" <<
-        " ["<<quarter_lx[1]<<","<<quarter_ux[1]<<";"<<quarter_ly[1]<<","<<quarter_uy[1]<<"]" <<
-        " ["<<quarter_lx[2]<<","<<quarter_ux[2]<<";"<<quarter_ly[2]<<","<<quarter_uy[2]<<"]" <<
-        " ["<<quarter_lx[3]<<","<<quarter_ux[3]<<";"<<quarter_ly[3]<<","<<quarter_uy[3]<<"]" << std::endl;
-    }
-    par_env->barrier();
-  }
+  // show_info();
   // # # # # #
 
 }
@@ -187,5 +176,23 @@ Topology::setup_quarters
     // quarter_ux[i] = idx_lx_rank + delta_x*(i%div_x+1);
     // quarter_uy[i] = idx_ly_rank + delta_y*(i%div_y+1);
     n_cells_quarter[i] = ( quarter_ux[i]-quarter_lx[i] ) * ( quarter_uy[i]-quarter_ly[i] );
+  }
+}
+
+void
+Topology::show_info
+(void) const
+{
+  for (int r = 0; r<size; ++r)
+  {
+    if (rank==r)
+    {
+      std::cout << " >> Rank " << r << " has limits: ["<<idx_lx_rank<<","<<idx_ux_rank<<";"<<idx_ly_rank<<","<<idx_uy_rank<<"]" << std::endl;
+      std::cout << "   quarters: ["<<quarter_lx[0]<<","<<quarter_ux[0]<<";"<<quarter_ly[0]<<","<<quarter_uy[0]<<"]" <<
+        " ["<<quarter_lx[1]<<","<<quarter_ux[1]<<";"<<quarter_ly[1]<<","<<quarter_uy[1]<<"]" <<
+        " ["<<quarter_lx[2]<<","<<quarter_ux[2]<<";"<<quarter_ly[2]<<","<<quarter_uy[2]<<"]" <<
+        " ["<<quarter_lx[3]<<","<<quarter_ux[3]<<";"<<quarter_ly[3]<<","<<quarter_uy[3]<<"]" << std::endl;
+    }
+    par_env->barrier();
   }
 }

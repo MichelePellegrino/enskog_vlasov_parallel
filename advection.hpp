@@ -57,10 +57,18 @@ public:
   ~TimeMarching<Standard>() = default;
   virtual void update_ensemble() override
   {
+    // DEBUG
+    // # # # # #
+    int counter_out_of_bound;
+    // # # # # #
     real_number ax, ay;
     ensemble->clear_buffers();
     for ( int i = 0; i<n_particles; ++i )
     {
+      // DEBUG
+      // # # # # #
+      counter_out_of_bound = 0;
+      // # # # # #
       /* GET FORCES */
       ax = mean_field->get_force_x( ensemble->data()[i].cell_x, ensemble->data()[i].cell_y ) / mass;
       ay = mean_field->get_force_y( ensemble->data()[i].cell_x, ensemble->data()[i].cell_y ) / mass;
@@ -68,10 +76,30 @@ public:
       ensemble->data()[i].xp += ensemble->data()[i].vx * delta_t + 0.5 * ax * delta_t * delta_t;
       ensemble->data()[i].yp += ensemble->data()[i].vy * delta_t + 0.5 * ay * delta_t * delta_t;
       /* PERIODIC BOUNDARY CONDITIONS ... */
-      while ( ensemble->data()[i].xp >= xmax )  ensemble->data()[i].xp += xmin - xmax;
-      while ( ensemble->data()[i].xp < xmin )   ensemble->data()[i].xp += xmax - xmin;
-      while ( ensemble->data()[i].yp >= ymax )  ensemble->data()[i].yp += ymin - ymax;
-      while ( ensemble->data()[i].yp < ymin )   ensemble->data()[i].yp += ymax - ymin;
+      while ( ensemble->data()[i].xp >= xmax )
+      {
+        counter_out_of_bound++;
+        ensemble->data()[i].xp += xmin - xmax;
+        assert(counter_out_of_bound<10 && "WTF!");
+      }
+      while ( ensemble->data()[i].xp < xmin )
+      {
+        counter_out_of_bound++;
+        ensemble->data()[i].xp += xmax - xmin;
+        assert(counter_out_of_bound<10 && "WTF!");
+      }
+      while ( ensemble->data()[i].yp >= ymax )
+      {
+        counter_out_of_bound++;
+        ensemble->data()[i].yp += ymin - ymax;
+        assert(counter_out_of_bound<10 && "WTF!");
+      }
+      while ( ensemble->data()[i].yp < ymin )
+      {
+        counter_out_of_bound++;
+        ensemble->data()[i].yp += ymax - ymin;
+        assert(counter_out_of_bound<10 && "WTF!");
+      }
       /* UPDATE VELOCITIES */
       ensemble->data()[i].vx += ax * delta_t;
       ensemble->data()[i].vy += ay * delta_t;
@@ -84,6 +112,8 @@ public:
       ensemble->add_to_inc_matrix(i);
     }
     par_env->barrier();
+    if ( par_env->is_root() )
+      std::cout << " >> exchanging particles..." << std::endl;
     ensemble->exchange_particles();
   }
 };

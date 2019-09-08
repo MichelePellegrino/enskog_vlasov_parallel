@@ -711,6 +711,7 @@ ConfigurationReader::read_conf_file
     std::cout << " >> npc = " << n_part/(double)(n_cells_x*n_cells_y) << std::endl;
 
   par_env->broadcast(n_part);
+  npart_global = n_part;
   int rem = n_part % par_env->get_size();
   n_part = n_part / par_env->get_size();
   if ( par_env->get_rank()<rem ) n_part++;
@@ -737,6 +738,8 @@ ConfigurationReader::setup_initial_configuration
 (void)
 {
 
+  int rem;
+
   if ( par_env->is_root() )
     std::cout << "### SETTING-UP INITIAL CONFIGURATION ###" << std::endl;
 
@@ -749,9 +752,10 @@ ConfigurationReader::setup_initial_configuration
       // real_number channel_area = (x_lim_p-x_lim_m) * (y_lim_p-y_lim_m);
       channel_area = (x_max+x_min) * (y_max+y_min);
       homogeneous_density = 6.0 * eta_liq0 / (ev_const::pi * diam_fluid*diam_fluid*diam_fluid);
-      channel_volume = n_part / homogeneous_density;
+      channel_volume = npart_global / homogeneous_density;
       channel_section = channel_volume / channel_area;
       cell_volume = dx*dy*channel_section;
+      // Distributing
       npart0 = n_part;  npart1 = 0;
       break;
     case 5:     /* Initial liquid layer in the middle, parallel to the x axis */
@@ -763,12 +767,17 @@ ConfigurationReader::setup_initial_configuration
       homogeneous_density1 = 6.0 * eta_liq1 / (ev_const::pi * diam_fluid*diam_fluid*diam_fluid);
       tmp0 = 1.0/(homogeneous_density0*channel_area0);
       tmp1 = 1.0/(homogeneous_density1*channel_area1);
-      npart1 = (int)(n_part*tmp0/(tmp0+tmp1));
-      npart0 = n_part - npart1;
+      npart1 = (int)(npart_global*tmp0/(tmp0+tmp1));
+      npart0 = npart_global - npart1;
       channel_volume0 = npart0 / homogeneous_density0;
       channel_volume1 = npart1 / homogeneous_density1;
       channel_section = (channel_volume0+channel_volume1) / (channel_area0+channel_area1);
       cell_volume = dx*dy*channel_section;
+      // Distributing
+      rem = npart0 % par_env->get_size(); npart0 = npart0 / par_env->get_size();
+      if ( par_env->get_rank()<rem ) npart0++;
+      rem = npart1 % par_env->get_size(); npart1 = npart1 / par_env->get_size();
+      if ( par_env->get_rank()<rem ) npart1++;
       break;
     case 6:     /* Initial liquid layer in the middle, parallel to the y axis */
       if ( par_env->is_root() )
@@ -779,14 +788,20 @@ ConfigurationReader::setup_initial_configuration
       homogeneous_density1 = 6.0 * eta_liq1 / (ev_const::pi * diam_fluid*diam_fluid*diam_fluid);
       tmp0 = 1.0/(homogeneous_density0*channel_area0);
       tmp1 = 1.0/(homogeneous_density1*channel_area1);
-      npart1 = (int)(n_part*tmp0/(tmp0+tmp1));
-      npart0 = n_part - npart1;
+      npart1 = (int)(npart_global*tmp0/(tmp0+tmp1));
+      npart0 = npart_global - npart1;
       channel_volume0 = npart0 / homogeneous_density0;
       channel_volume1 = npart1 / homogeneous_density1;
       channel_section = (channel_volume0+channel_volume1) / (channel_area0+channel_area1);
       cell_volume = dx*dy*channel_section;
+      // Distributing
+      rem = npart0 % par_env->get_size(); npart0 = npart0 / par_env->get_size();
+      if ( par_env->get_rank()<rem ) npart0++;
+      rem = npart1 % par_env->get_size(); npart1 = npart1 / par_env->get_size();
+      if ( par_env->get_rank()<rem ) npart1++;
       break;
     default:
-      std::cerr << "Unrecognized configuration" << std::endl;
+      if ( par_env->is_root() )
+        std::cerr << "Unrecognized configuration" << std::endl;
   }
 }

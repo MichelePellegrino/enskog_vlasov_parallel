@@ -57,6 +57,8 @@ public:
   Topology(DSMC*);
   ~Topology() = default;
 
+  void show_info(void) const;
+
   int tag_subdom(int, int);
 
   inline int get_idx_lx(int r) { return idx_lx[r]; }

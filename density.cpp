@@ -57,7 +57,7 @@ DensityKernel::DensityKernel
   avg_convolutioner( average_reduced_density, weights, reduced_density, 0.0 ),
 
   idx_map( ensemble->get_n_particles(), 0 ),
-  cum_num( grid->get_n_cells(), 0 ),
+  cum_num( grid->get_n_cells()+1, 0 ),
   raw_num( grid->get_n_cells(), 0 )
 
   {
@@ -104,16 +104,16 @@ DensityKernel::binning
   }
   // Setting cumulate density
   int NC = grid->get_n_cells();
-  cum_num.assign(NC, 0);
+  cum_num.assign(NC+1, 0);
   // There is surely a more elegant way to proceed, but I don't have time!
   // (the 'if' condition is so inefficient...)
-  for (int k = 1; k<NC; ++k)
+  for (int k = 1; k<NC+1; ++k)
   {
     i = grid->lexico_inv(k-1).first;
     j = grid->lexico_inv(k-1).second;
-    if ( i >= n_part_cell.get_lx() && i < n_part_cell.get_ux()
-      && j >= n_part_cell.get_ly() && j < n_part_cell.get_uy() )
-        cum_num[k] = cum_num[k-1] + n_part_cell(i, j);
+    // if ( i >= n_part_cell.get_lx() && i < n_part_cell.get_ux() && j >= n_part_cell.get_ly() && j < n_part_cell.get_uy() )
+    if ( topology->get_topology_map(i,j) == par_env->get_rank() )
+      cum_num[k] = cum_num[k-1] + n_part_cell(i, j);
   }
 }
 
@@ -128,8 +128,8 @@ DensityKernel::compute_ind_map_part
   for (int jp = 0; jp<NP; ++jp)
   {
     jc = grid->lexico(ensemble->get_cx(jp), ensemble->get_cy(jp));
-    raw_num[jc] += 1;
     k = cum_num[jc] + raw_num[jc];
+    raw_num[jc] += 1;
     idx_map[k] = jp;
   }
 }
@@ -217,7 +217,6 @@ DensityKernel::perform_density_kernel
 }
 
 // TESTING
-
 void
 DensityKernel::print_binned_particles
 (void) const
@@ -235,7 +234,7 @@ DensityKernel::print_reduced_numdens
 {
   for (int r = 0; r<par_env->get_size(); ++r) {
     if ( r==par_env->get_rank() )
-      std::cout << "rank " << r << " : reduced numdens = " << num_dens_cell.sum() << std::endl;
+      std::cout << "rank " << r << " : max numdens = " << num_dens_cell.maxCoeff() << std::endl;
   }
   par_env->barrier();
 }
@@ -246,7 +245,7 @@ DensityKernel::print_reduced_aveta
 {
   for (int r = 0; r<par_env->get_size(); ++r) {
     if ( r==par_env->get_rank() )
-      std::cout << "rank " << r << " : reduced aveta = " << average_reduced_density.sum() << std::endl;
+      std::cout << "rank " << r << " : max aveta = " << average_reduced_density.maxCoeff() << std::endl;
   }
   par_env->barrier();
 }

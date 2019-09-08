@@ -100,12 +100,13 @@ Ensemble::populate
       }
       break;
     default:
-      std::cerr << "Unrecognized configuration" << std::endl;
+      if ( par_env->is_root() )
+        std::cerr << "Unrecognized configuration" << std::endl;
   }
 
   for ( int i = 0; i<n_particles; ++i )
   {
-    
+
     particles[i].cell_x = (int) ( (particles[i].xp-grid->get_x_min() ) / conf->get_dx() );
     particles[i].cell_y = (int) ( (particles[i].yp-grid->get_y_min() ) / conf->get_dy() );
     rng->sample_box_muller (

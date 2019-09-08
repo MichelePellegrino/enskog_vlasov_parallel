@@ -214,8 +214,7 @@ CollisionHandler::perform_collisions
   compute_collision_number();
   shuffle_order();
   // Reset number of collisions
-  int out_bound = 0;
-  n_fake = 0; n_real = 0; n_total = 0;
+  out_bound = 0; n_fake = 0; n_real = 0; n_total = 0;
   // DEBUG
   // # # # # #
   print_est_collisions();
@@ -356,6 +355,7 @@ CollisionHandler::perform_collisions
         }
       }
     }
+    // It has been shut down for DEBUG purposes!
     parallel_collision_counter = perform_parallel_collisions();
     n_total += parallel_collision_counter.total;
     n_real += parallel_collision_counter.real;
@@ -389,6 +389,9 @@ CollisionHandler::perform_collisions
 
 }
 
+// ############################################### //
+// NEED TO BE DEBUGGED!!! TOO MANY OUT-OF-BOUND!!! //
+// ############################################### //
 CollisionCounter
 CollisionHandler::perform_parallel_collisions
 (void)
@@ -396,6 +399,7 @@ CollisionHandler::perform_parallel_collisions
   int idx_cell2, i_cell2, j_cell2, i_hcell2, j_hcell2, idx, idx_p2, i_cell1, j_cell1;
   int numdens_cell2, aa, fk;
   CollisionCounter collision_counter(0, 0, 0, 0);
+  /* PHASE I */
   for (int rs = 0; rs<size; ++rs)
   {
     if ( rs == rank )
@@ -450,6 +454,7 @@ CollisionHandler::perform_parallel_collisions
       }
     }
   }
+  /* PHASE II */
   for (int rs = 0; rs<size; ++rs)
   {
     if ( rs == rank )
@@ -491,7 +496,6 @@ CollisionHandler::perform_parallel_collisions
         i_cell1 = grid->lexico_inv( cells1_process_map[rs][i] ).first;
         j_cell1 = grid->lexico_inv( cells1_process_map[rs][i] ).second;
         fk = scalar_prod * aa / ( a11(i_cell1, j_cell1) * vrmax11(i_cell1, j_cell1) );
-
         perform_collision_send[rs].push_back(
           (scalar_prod > 0) * (numdens_process_map_recv[rs][i] > 0) * (rng->sample_uniform() < fk) );
         delta = scaled_k_process_map[rs][i]*scalar_prod*species->get_diam_fluid();
@@ -519,6 +523,7 @@ CollisionHandler::perform_parallel_collisions
       }
     }
   }
+  /* PHASE III */
   for (int rs = 0; rs<size; ++rs)
   {
     if ( rs == rank )
@@ -556,8 +561,7 @@ void
 CollisionHandler::update_majorants
 (void)
 {
-
-  if ( (double)n_fake > alpha_1*(double)n_real )
+  if ( (double)out_bound > alpha_1*(double)n_real )
   {
     a11 = anew;
     vrmax11 = vrmaxnew;
@@ -567,7 +571,6 @@ CollisionHandler::update_majorants
     a11 = alpha_2*a11;
     vrmax11 = alpha_2*vrmax11;
   }
-
 }
 
 void
