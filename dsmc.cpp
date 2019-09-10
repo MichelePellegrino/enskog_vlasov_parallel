@@ -78,17 +78,28 @@ n_iter_thermo ( conf->get_niter_thermo() ),
 n_iter_sample ( conf->get_niter_sampling() )
 {
 
+  if ( conf->get_mean_f_gg() == 'y' || conf->get_mean_f_gg() == 'Y' )
+  {
+    mean_field_gg = true;
+    if (par_env->is_root())
+      std::cout << "### MEAN-FIELD ON ###" << std::endl;
+  }
+  else
+  {
+    mean_field_gg = false;
+    if (par_env->is_root())
+      std::cout << "### MEAN-FIELD OFF ###" << std::endl;
+  }
+
   initialize_simulation();
   par_env->barrier();
 
   // TESTING MODULES
-  test_sampling();
-  test_output();
+  // test_sampling();
+  // test_output();
 
   // TESTING LOOP
-  // Apparently, there are issues with the parallel collisions;
-  // let us test streaming and mean field, for now
-  // test_loop(DEFAULT_DUMMY_TEST_ITER);
+  test_loop(DEFAULT_DUMMY_TEST_ITER);
 
 }
 
@@ -186,11 +197,14 @@ DSMC::test_loop
   for (int i = 0; i<n_tests; ++i)
   {
     if ( par_env->is_root() ) std::cout << " >> test iteration: " << i << std::endl;
-    test_force_field();
+    if ( mean_field_gg )
+      test_force_field();
     test_time_marching();
-    test_thermostat();
+    if ( !SHUT_THERMO )
+      test_thermostat();
     test_density();
-    test_collisions();
+    if ( !SHUT_COLLISIONS )
+      test_collisions();
     test_sampling();
   }
   collision_handler->gather_collisions();
@@ -204,8 +218,11 @@ DSMC::initialize_simulation
 {
   if ( par_env->is_root() ) std::cout << "### INITIALIZINING DENSITY FIELD ###" << std::endl;
   density->perform_density_kernel();
-  if ( par_env->is_root() ) std::cout << "### INITIALIZINING COLLISIONS MAJORANTS ###" << std::endl;
-  collision_handler->compute_majorants();
+  if ( !SHUT_COLLISIONS )
+  {
+    if ( par_env->is_root() ) std::cout << "### INITIALIZINING COLLISIONS MAJORANTS ###" << std::endl;
+    collision_handler->compute_majorants();
+  }
 }
 
 void

@@ -29,6 +29,14 @@
 #define DEFAULT_DUMMY_TEST_ITER 10
 #endif
 
+#ifndef SHUT_COLLISIONS
+#define SHUT_COLLISIONS true
+#endif
+
+#ifndef SHUT_THERMO
+#define SHUT_THERMO true
+#endif
+
 #define DENSITY_TAG   0
 #define FORCES_TAG    1
 #define ADVECT_TAG    2
@@ -93,6 +101,7 @@ private:
 
   int n_iter_thermo = DEFAULT_ITER_THERMO;
   int n_iter_sample = DEFAULT_ITER_SAMPLE;
+  bool mean_field_gg;
 
   std::map < int, std::vector<int> > stored_elapsed_times;
 

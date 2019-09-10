@@ -123,6 +123,8 @@ public:
 
   // Getter mathods
 
+  inline char get_mean_f_gg() const { return mean_f_gg; }
+
   inline int get_seed() const { return seed; }
   inline int get_L_x_1() const { return L_x_1; }
   inline int get_L_x_2() const { return L_x_2; }
@@ -170,6 +172,10 @@ public:
 
   inline real_number get_dx() const { return dx; }
   inline real_number get_dy() const { return dy; }
+
+  inline real_number get_vx_ini() const { return vx_ini; }
+  inline real_number get_vy_ini() const { return vy_ini; }
+  inline real_number get_vz_ini() const { return vz_ini; }
 
   // Initial configuration
   inline real_number get_channel_area() const { return channel_area; }

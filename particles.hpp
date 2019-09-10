@@ -29,6 +29,7 @@ class Ensemble : protected Motherbase
 private:
 
   int n_particles;                    /*!< Total number of particles */
+  real_number vx_ini, vy_ini, vz_ini;
   real_number T_ini;
   real_number mass;
 

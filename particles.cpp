@@ -9,6 +9,9 @@ Ensemble::Ensemble
 (DSMC* dsmc):
   Motherbase(dsmc),
   n_particles(conf->get_n_part()),
+  vx_ini(conf->get_vx_ini()),
+  vy_ini(conf->get_vy_ini()),
+  vz_ini(conf->get_vz_ini()),
   T_ini(conf->get_T_ini()),
   mass(species->get_mass_fluid()),
   domain_rank(par_env->get_rank()),
@@ -114,6 +117,9 @@ Ensemble::populate
       particles[i].vx,
       particles[i].vy,
       particles[i].vz );
+    particles[i].vx += vx_ini;
+    particles[i].vy += vy_ini;
+    particles[i].vz += vz_ini;
     particles[i].p_tag = i;
     particles[i].r_tag = topology->tag_subdom(particles[i].cell_x, particles[i].cell_y);
 

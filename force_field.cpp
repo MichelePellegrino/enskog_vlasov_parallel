@@ -31,12 +31,12 @@ ForceField::ForceField(DSMC* dsmc):
 
 {
 
-  if(par_env->get_rank()==MPI_MASTER)
-    std::cout << "### COMPUTING POTENTIAL KERNEL MATRIX ###" << std::endl;
-  // DEBUG
-  // # # # # #
-  compute_kernel_matrix();
-  // # # # # #
+  if ( conf->get_mean_f_gg() == 'y' || conf->get_mean_f_gg() == 'Y' )
+  {
+    if(par_env->get_rank()==MPI_MASTER)
+      std::cout << "### COMPUTING POTENTIAL KERNEL MATRIX ###" << std::endl;
+    compute_kernel_matrix();
+  }
 
 }
 

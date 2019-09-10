@@ -671,6 +671,8 @@ ConfigurationReader::read_conf_file
 
   }
 
+  par_env->broadcast(mean_f_gg);
+
   par_env->broadcast(seed);
   par_env->broadcast(L_x_1);
   par_env->broadcast(L_x_2);
@@ -730,6 +732,10 @@ ConfigurationReader::read_conf_file
 
   dx = (double)(x_max+x_min) / (double)n_cells_x;
   dy = (double)(y_max+y_min) / (double)n_cells_y;
+
+  par_env->broadcast(vx_ini);
+  par_env->broadcast(vy_ini);
+  par_env->broadcast(vz_ini);
 
 }
 
