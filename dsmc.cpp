@@ -82,13 +82,13 @@ n_iter_sample ( conf->get_niter_sampling() )
   par_env->barrier();
 
   // TESTING MODULES
-  // test_sampling();
-  // test_output();
+  test_sampling();
+  test_output();
 
   // TESTING LOOP
   // Apparently, there are issues with the parallel collisions;
   // let us test streaming and mean field, for now
-  test_loop(DEFAULT_DUMMY_TEST_ITER);
+  // test_loop(DEFAULT_DUMMY_TEST_ITER);
 
 }
 

@@ -21,19 +21,19 @@
 #
 # ** STATO FISICO DELLE PARETI          :
 #
-# Temp. iniziale liquido ==============>.... 0.9276e00
-# Temp. iniziale liquido ==============>.... 0.9276e00
+# Temp. iniziale liquido ==============>.... 0.4000e00
+# Temp. iniziale liquido ==============>.... 0.4000e00
 # DENSITA' DELLA PARETE per campo medio>.... 0.7000e00
 # DENSITA' DELLA PARETE per correlazio >.... 0.7000e00
-# DENSITA' DEL GAS     ================>.... 0.5581e-01
-# DENSITA' DEL LIQUIDO ================>.... 0.2283e00
-# Presenza di strato liquido iniziale==>....       0
+# DENSITA' DEL GAS     ================>.... 0.1088e-02
+# DENSITA' DEL LIQUIDO ================>.... 0.4396e00
+# Presenza di strato liquido iniziale==>....       5
 # spessore strato liquido iniziale x ==>.... 0.1800e02
-# spessore strato liquido iniziale y ==>.... 0.0000e00
+# spessore strato liquido iniziale y ==>.... 0.1800e02
 # Raggio goccia iniziale liquida     ==>.... 0.3000e02
 # Offset goccia liquida iniziale     ==>.... 0.1400e02
 # Number of iterations for thermostat =>....      50
-# Reference temperature for thermostat=>.... 0.5000e00
+# Reference temperature for thermostat=>.... 0.4000e00
 # Keep baricentre fixed (1) or not (0)=>....        0
 # Natura del Bordo x1, parete o libero =>... h
 # Natura del Bordo x2, parete o libero =>... h
