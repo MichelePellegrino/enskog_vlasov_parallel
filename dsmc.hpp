@@ -30,11 +30,11 @@
 #endif
 
 #ifndef SHUT_COLLISIONS
-#define SHUT_COLLISIONS true
+#define SHUT_COLLISIONS false
 #endif
 
 #ifndef SHUT_THERMO
-#define SHUT_THERMO true
+#define SHUT_THERMO false
 #endif
 
 #define DENSITY_TAG   0

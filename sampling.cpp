@@ -17,8 +17,6 @@ Sampler::Sampler(DSMC* dsmc):
     topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0 ),
   inner_counter_cast ( topology->get_idx_lx(rank), topology->get_idx_ux(rank),
     topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0.0 ),
-  dt_factor          ( topology->get_idx_lx(rank), topology->get_idx_ux(rank),
-    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0.0 ),
 
   vx_avg      ( topology->get_idx_lx(rank), topology->get_idx_ux(rank),
     topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0.0 ),
@@ -52,23 +50,12 @@ Sampler::Sampler(DSMC* dsmc):
     topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0 ),
   fy_avg ( topology->get_idx_lx(rank), topology->get_idx_ux(rank),
     topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0 ),
+  ph_avg ( topology->get_idx_lx(rank), topology->get_idx_ux(rank),
+    topology->get_idx_ly(rank), topology->get_idx_uy(rank), 0 ),
 
-  global_vx_avg       ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_vy_avg       ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_vz_avg       ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
   global_temp_avg     ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_pxx_avg      ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_pyy_avg      ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_pzz_avg      ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_pxy_avg      ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_pxz_avg      ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_pyz_avg      ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_qx_avg       ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_qy_avg       ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_qz_avg       ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
+  global_ph_avg       ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
   global_numdens_avg  ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_fx_avg       ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
-  global_fy_avg       ( 0, grid->get_n_cells_x(), 0, grid->get_n_cells_y(), 0.0 ),
 
   n_cells_x (topology->get_idx_ux_rank() - topology->get_idx_lx_rank()),
   low_x (topology->get_idx_lx_rank()),
@@ -82,7 +69,6 @@ Sampler::reset
 {
   inner_counter = 0;
   inner_counter_cast = 0.0;
-  dt_factor = 0.0;
   vx_avg = 0.0;
   vy_avg = 0.0;
   vz_avg = 0.0;
@@ -185,27 +171,28 @@ Sampler::average
 {
 
   inner_counter_cast.copy_cast<int>(inner_counter);
-  dt_factor = inner_counter_cast / ( (double)(outer_counter)*grid->get_cell_volume() );
+  numdens_avg = inner_counter_cast / ( (double)outer_counter * grid->get_cell_volume() );
 
   vx_avg /= inner_counter_cast;
   vy_avg /= inner_counter_cast;
   vz_avg /= inner_counter_cast;
-  pxx_avg /= inner_counter_cast;    pxx_avg -= vx_avg*vx_avg;   pxx_avg *= dt_factor;
-  pyy_avg /= inner_counter_cast;    pyy_avg -= vy_avg*vy_avg;   pyy_avg *= dt_factor;
-  pzz_avg /= inner_counter_cast;    pzz_avg -= vz_avg*vz_avg;   pzz_avg *= dt_factor;
-  pxy_avg /= inner_counter_cast;    pxy_avg -= vx_avg*vy_avg;   pxy_avg *= dt_factor;
-  pxz_avg /= inner_counter_cast;    pxz_avg -= vx_avg*vz_avg;   pxz_avg *= dt_factor;
-  pyz_avg /= inner_counter_cast;    pyz_avg -= vy_avg*vz_avg;   pyz_avg *= dt_factor;
-  qz_avg /= 2.0*inner_counter_cast; qz_avg *= dt_factor;
-  qx_avg /= 2.0*inner_counter_cast; qx_avg *= dt_factor;
-  qy_avg /= 2.0*inner_counter_cast; qy_avg *= dt_factor;
+  pxx_avg /= inner_counter_cast;    pxx_avg -= vx_avg*vx_avg;   pxx_avg *= numdens_avg;
+  pyy_avg /= inner_counter_cast;    pyy_avg -= vy_avg*vy_avg;   pyy_avg *= numdens_avg;
+  pzz_avg /= inner_counter_cast;    pzz_avg -= vz_avg*vz_avg;   pzz_avg *= numdens_avg;
+  pxy_avg /= inner_counter_cast;    pxy_avg -= vx_avg*vy_avg;   pxy_avg *= numdens_avg;
+  pxz_avg /= inner_counter_cast;    pxz_avg -= vx_avg*vz_avg;   pxz_avg *= numdens_avg;
+  pyz_avg /= inner_counter_cast;    pyz_avg -= vy_avg*vz_avg;   pyz_avg *= numdens_avg;
+  qz_avg /= 2.0*inner_counter_cast; qz_avg *= numdens_avg;
+  qx_avg /= 2.0*inner_counter_cast; qx_avg *= numdens_avg;
+  qy_avg /= 2.0*inner_counter_cast; qy_avg *= numdens_avg;
   temp_avg /= inner_counter_cast;
   temp_avg = ( temp_avg -
     vx_avg*vx_avg - vy_avg*vy_avg - vz_avg*vz_avg ) / 3.0;
 
   fx_avg /= (double)outer_counter;
   fx_avg /= (double)outer_counter;
-  numdens_avg = inner_counter_cast / ( (double)outer_counter * grid->get_cell_volume() );
+
+  ph_avg = ( pxx_avg + pyy_avg + pzz_avg ) / 3.0;
 
   outer_counter = 0;
 
@@ -225,7 +212,8 @@ Sampler::gather_samples
   {
     // SEND
     numdens_avg.send_block(lx_send, ly_send, ux_send-lx_send, uy_send-ly_send, MPI_MASTER);
-    // temp_avg.send_block(lx_send, ly_send, ux_send-lx_send, uy_send-ly_send, MPI_MASTER);
+    temp_avg.send_block(lx_send, ly_send, ux_send-lx_send, uy_send-ly_send, MPI_MASTER);
+    ph_avg.send_block(lx_send, ly_send, ux_send-lx_send, uy_send-ly_send, MPI_MASTER);
   }
   else
   {
@@ -236,7 +224,8 @@ Sampler::gather_samples
       {
         // Copy its own data
         global_numdens_avg.set_block(lx_send, ux_send, ly_send, uy_send, numdens_avg);
-        // global_temp_avg.set_block(lx_send, ux_send, ly_send, uy_send, temp_avg);
+        global_temp_avg.set_block(lx_send, ux_send, ly_send, uy_send, temp_avg);
+        global_ph_avg.set_block(lx_send, ux_send, ly_send, uy_send, ph_avg);
       }
       else
       {
@@ -246,7 +235,8 @@ Sampler::gather_samples
         ly_recv = topology->get_idx_ly(r);
         uy_recv = topology->get_idx_uy(r);
         global_numdens_avg.recv_block(lx_recv, ly_recv, ux_recv-lx_recv, uy_recv-ly_recv, r);
-        // global_temp_avg.recv_block(lx_recv, ly_recv, ux_recv-lx_recv, uy_recv-ly_recv, r);
+        global_temp_avg.recv_block(lx_recv, ly_recv, ux_recv-lx_recv, uy_recv-ly_recv, r);
+        global_ph_avg.recv_block(lx_recv, ly_recv, ux_recv-lx_recv, uy_recv-ly_recv, r);
       }
     }
   }

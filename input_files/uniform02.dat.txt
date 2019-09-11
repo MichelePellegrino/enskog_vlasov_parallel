@@ -7,14 +7,14 @@
 # MASSA MOLECOLARE LIQUIDO ============>.... 0.1000e01
 # DIAMETRO MOLECOLARE LIQUIDO =========>.... 0.1000e01
 # Tipo di potenziale gas-gas          =>.... p
-# Campo medio gas-gas yes or no       =>.... n
+# Campo medio gas-gas yes or no       =>.... y
 # PARAMETRO POTENZIALE PHI11 ==========>.... 0.1000e01
 # ESPONENTE POTENZIALE PHI11 ==========>.... 0.6000e01
 # Numero punti per spline pot gas-gas =>....     1200
 # MASSA MOLECOLARE SOLIDO =============>.... 0.2000e01
 # DIAMETRO MOLECOLARE SOLIDO ==========>.... 0.1000e01
 # Tipo di potenziale gas-solido       =>.... e
-# Campo medio gas-wall yes or no      =>.... n
+# Campo medio gas-wall yes or no      =>.... y
 # PARAMETRO POTENZIALE PHI12 ==========>.... 0.1500e01
 # ESPONENTE POTENZIALE PHI12 ==========>.... 0.5405e01
 # Numero punti per spline pot gas-sol =>....     1200
@@ -82,8 +82,8 @@
 # NUMERO PARTICELLE LIQUIDO ===========>....  1250000
 # mean_vel=0 (0) or /=0 (1)  ==========>            1
 # Restart 0 no 1 yes 2 yes mirror  ====>            0
-# vx_ini ==============================>     0.1000e03
-# vy_ini ==============================>     0.1000e03
+# vx_ini ==============================>     0.0000e00
+# vy_ini ==============================>     0.0000e00
 # vz_ini ==============================>     0.0000e00
 # TINI ================================>     0.0000e02
 # TMAX ================================>     1.0000e03

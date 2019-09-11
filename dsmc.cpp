@@ -246,7 +246,8 @@ DSMC::output_all_samples
   if ( par_env->is_root() )
   {
     std::cout << "### OUTPUT ALL SAMPLES ###" << std::endl;
-    // ...
+    output->output_sample(sampler->get_temp_avg(), "output_files/samples/test_sample_temperature.txt");
+    output->output_sample(sampler->get_ph_avg(), "output_files/samples/test_sample_hpressure.txt");
     output->output_sample(sampler->get_numdens_avg(), "output_files/samples/test_sample_numdens.txt");
   }
 }
@@ -258,7 +259,8 @@ DSMC::output_all_samples
   if ( par_env->is_root() )
   {
     std::cout << "### OUTPUT ALL SAMPLES ###" << std::endl;
-    // ...
+    output->output_sample(sampler->get_temp_avg(), "output_files/samples/test_sample_temperature",t);
+    output->output_sample(sampler->get_ph_avg(), "output_files/samples/test_sample_hpressure",t);
     output->output_sample(sampler->get_numdens_avg(), "output_files/samples/test_sample_numdens", t);
   }
 }
