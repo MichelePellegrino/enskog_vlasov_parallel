@@ -1,3 +1,7 @@
+/*! \file configuration.cpp
+ *  \brief Source code for DSMC class
+ */
+
 #include "dsmc.hpp"
 #include "parallel_environment.hpp"
 #include "display.hpp"
@@ -78,6 +82,10 @@ n_iter_thermo ( conf->get_niter_thermo() ),
 n_iter_sample ( conf->get_niter_sampling() )
 {
 
+  /*!
+   *  Establish whether the mean field has to be computed; mean field computation
+   *  is very time consuming: better de-activate the routine if not needed
+   */
   if ( conf->get_mean_f_gg() == 'y' || conf->get_mean_f_gg() == 'Y' )
   {
     mean_field_gg = true;
@@ -94,17 +102,25 @@ n_iter_sample ( conf->get_niter_sampling() )
   initialize_simulation();
   par_env->barrier();
 
-  // TESTING MODULES
+  /*!
+   *  Preliminary tests: comment the ones that are not needed
+   */
   // test_sampling();
   // test_output();
 
-  // TESTING LOOP
+  /*!
+   *  DSMC loop is tested for analysis purposes (e.g. speed-up)
+   */
   test_loop(DEFAULT_DUMMY_TEST_ITER);
 
 }
 
 
-// Testing
+// TESTING FUNCTIONALITIES
+
+/*! \fn void DSMC::test_density (void)
+    \brief Tests the density kernel and stores partial time
+*/
 void
 DSMC::test_density
 (void)
@@ -118,6 +134,9 @@ DSMC::test_density
   if ( par_env->is_root() ) stopwatch.show_local_elapsed(DENSITY_TAG);
 }
 
+/*! \fn void DSMC::test_force_field (void)
+    \brief Tests mean-field computation and stores partial time
+*/
 void
 DSMC::test_force_field
 (void)
@@ -131,6 +150,9 @@ DSMC::test_force_field
   if ( par_env->is_root() ) stopwatch.show_local_elapsed(FORCES_TAG);
 }
 
+/*! \fn void DSMC::test_time_marching (void)
+    \brief Tests an advection iteration and stores partial time
+*/
 void
 DSMC::test_time_marching
 (void)
@@ -144,6 +166,9 @@ DSMC::test_time_marching
   if ( par_env->is_root() ) stopwatch.show_local_elapsed(ADVECT_TAG);
 }
 
+/*! \fn void DSMC::test_collisions (void)
+    \brief Tests collisions kernel and stores partial time
+*/
 void
 DSMC::test_collisions
 (void)
@@ -157,6 +182,9 @@ DSMC::test_collisions
   if ( par_env->is_root() ) stopwatch.show_local_elapsed(COLLISION_TAG);
 }
 
+/*! \fn void DSMC::test_thermostat (void)
+    \brief Tests a thermostat iteration
+*/
 void
 DSMC::test_thermostat
 (void)
@@ -165,6 +193,9 @@ DSMC::test_thermostat
   thermostat->rescale_velocity();
 }
 
+/*! \fn void DSMC::test_sampling (void)
+    \brief Tests sampling, averaging and gathering, stores partial time
+*/
 void
 DSMC::test_sampling
 (void)
@@ -180,6 +211,11 @@ DSMC::test_sampling
   if ( par_env->is_root() ) stopwatch.show_local_elapsed(SAMPLING_TAG);
 }
 
+/*! \fn void DSMC::test_output (void)
+    \brief Tests output
+
+    Outputs (1) samples, (2) collisional statistics, (3) elapsed times
+*/
 void
 DSMC::test_output
 (void)
@@ -190,6 +226,9 @@ DSMC::test_output
   output_elapsed_times();
 }
 
+/*! \fn void DSMC::test_loop (int n_tests)
+    \brief Tests n_tests iterations of the DSMC loop
+*/
 void
 DSMC::test_loop
 (int n_tests)
@@ -211,7 +250,12 @@ DSMC::test_loop
   test_output();
 }
 
-// Initialize
+
+// DSMC SIMULATION STEPS
+
+/*! \fn void DSMC::initialize_simulation (void)
+    \brief Initialize density fielda and computes first estimate of coll. majorants
+*/
 void
 DSMC::initialize_simulation
 (void)
@@ -229,16 +273,22 @@ void
 DSMC::dsmc_iteration
 (void)
 {
-
+  // TO BE CONTINUED ...
 }
 
 void
 DSMC::dsmc_loop
 (void)
 {
-
+  // TO BE CONTINUED ...
 }
 
+
+// OUTPUT FUNCTIONALITIES
+
+/*! \fn void DSMC::output_all_samples (void)
+    \brief Outputs temperature, pressure and density; no time tag
+*/
 void
 DSMC::output_all_samples
 (void)
@@ -252,6 +302,9 @@ DSMC::output_all_samples
   }
 }
 
+/*! \fn void DSMC::output_all_samples (real_number t)
+    \brief Outputs temperature, pressure and density; with time tag
+*/
 void
 DSMC::output_all_samples
 (real_number t)
@@ -265,6 +318,9 @@ DSMC::output_all_samples
   }
 }
 
+/*! \fn void DSMC::output_collision_statistics (void)
+    \brief Outputs collisions statistics (fake, real, total, out of bound)
+*/
 void
 DSMC::output_collision_statistics
 (void)
@@ -278,6 +334,10 @@ DSMC::output_collision_statistics
   }
 }
 
+
+/*! \fn void DSMC::output_elapsed_times (void)
+    \brief Outputs partial CPU times for each sub-routine
+*/
 void
 DSMC::output_elapsed_times
 (void)

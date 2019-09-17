@@ -1,3 +1,7 @@
+/*! \file configuration.hpp
+ *  \brief Header containing the class that reads configuration data from file
+ */
+
 #ifndef EV_CONFIGURATION_HPP
 #define EV_CONFIGURATION_HPP
 

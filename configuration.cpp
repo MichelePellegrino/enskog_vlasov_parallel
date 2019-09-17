@@ -1,3 +1,7 @@
+/*! \file configuration.cpp
+ *  \brief Source code for configuration reader
+ */
+
 #include "configuration.hpp"
 #include "parallel_environment.hpp"
 

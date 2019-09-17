@@ -1,6 +1,11 @@
+/*! \file dmsc.hpp
+ *  \brief Header containing main class wrapper for DSMC algorithm
+ */
+
 #ifndef EV_DSMC_HPP
 #define EV_DSMC_HPP
 
+// Including headers for utility libraries (or classes without circular dependencies)
 #include "types.hpp"
 #include "random.hpp"
 #include "stopwatch.hpp"
@@ -9,33 +14,53 @@
 #include "potential.hpp"
 #include "correlations.hpp"
 
+// Include STL libraries for pointers, static assert and CPU times map
+#include <memory>
 #include <cassert>
 #include <map>
 #include <vector>
 
+/*! \def DEFAULT_ITER_THERMO
+    \brief Default thermostat iterations (only for testing purposes)
+*/
 #ifndef DEFAULT_ITER_THERMO
 #define DEFAULT_ITER_THERMO 10
 #endif
 
+/*! \def DEFAULT_ITER_SAMPLE
+    \brief Default sampling iterations (only for testing purposes)
+*/
 #ifndef DEFAULT_ITER_SAMPLE
 #define DEFAULT_ITER_SAMPLE 100
 #endif
 
+/*! \def DEFAULT_DUMMY_ITER
+    \brief Default total simulation iterations (only for testing purposes)
+*/
 #ifndef DEFAULT_DUMMY_ITER
 #define DEFAULT_DUMMY_ITER 500
 #endif
 
+/*! \def DEFAULT_DUMMY_TEST_ITER
+    \brief Default iterations for testing purposes (e.g. speed-up)
+*/
 #ifndef DEFAULT_DUMMY_TEST_ITER
 #define DEFAULT_DUMMY_TEST_ITER 10
 #endif
 
+// FOR DEBUG PURPOSES
 #ifndef SHUT_COLLISIONS
 #define SHUT_COLLISIONS false
 #endif
 
+// FOR DEBUG PURPOSES
 #ifndef SHUT_THERMO
 #define SHUT_THERMO false
 #endif
+
+/*!
+ *  Stopwatch tags for partial times have been defined with meaningful names
+ */
 
 #define DENSITY_TAG   0
 #define FORCES_TAG    1
@@ -44,6 +69,12 @@
 #define SAMPLING_TAG  4
 
 #define N_TAGS        5
+
+/*!
+ *  Forward declarations are needed in order for the design to work: DSMC needs
+ *  to encapsulate pointers to all modules, even if referenced classes are constructed
+ *  in the source code
+ */
 
 class ParallelEnvironment;
 class IOHandler;
@@ -61,6 +92,12 @@ class Output;
 
 template<MarchingType tm_type> class TimeMarching;
 
+/*! \class DSMC
+ *  \brief Class for the overall DSMC procedure
+ *
+ *  DSMC wraps references to all classes implementing modules; moreover, it defines
+ *  the functions for the dsmc loop, as well as testing and output functionalities
+ */
 class DSMC
 {
 
@@ -70,47 +107,47 @@ public:
 
 private:
 
-  DefaultPointer<ParallelEnvironment> par_env;
-  DefaultPointer<IOHandler> io_hand;
-  DefaultPointer<ConfigurationReader> conf;
+  DefaultPointer<ParallelEnvironment> par_env;            /*!< Wrapper for parallel environment functonalities  */
+  DefaultPointer<IOHandler> io_hand;                      /*!< Parallel IO handler (UNUSED)                     */
+  DefaultPointer<ConfigurationReader> conf;               /*!< Configuration reader                             */
 
-  DefaultPointer<RandomEngine> rng;
+  DefaultPointer<RandomEngine> rng;                       /*!< Random numbers generator                         */
 
-  DefaultPointer<Species> species;
-  DefaultPointer<Times> times;
-  DefaultPointer<Boundary> boundary;
-  DefaultPointer<Grid> grid;
+  DefaultPointer<Species> species;                        /*!< Parameters for particle species                  */
+  DefaultPointer<Times> times;                            /*!< Start/end times and intervals                    */
+  DefaultPointer<Boundary> boundary;                      /*!< Parameters defining boundary cond.               */
+  DefaultPointer<Grid> grid;                              /*!< Numerical parameters of the grid                 */
 
-  DefaultPointer<Topology> topology;
+  DefaultPointer<Topology> topology;                      /*!< Class defining parallel processes topology       */
 
-  DefaultPointer<Ensemble> ensemble;
-  DefaultPointer<Thermostat> thermostat;
+  DefaultPointer<Ensemble> ensemble;                      /*!< Particles (storage, population and exchange)     */
+  DefaultPointer<Thermostat> thermostat;                  /*!< Thermostat (rescaling velocities)                */
 
-  DefaultPointer<DensityKernel> density;
-  DefaultPointer<NondirectionalPairPotential> potential;
-  DefaultPointer<ForceField> mean_field;
-  DefaultPointer<TimeMarching<TM>> time_marching;
-  DefaultPointer<CollisionHandler> collision_handler;
+  DefaultPointer<DensityKernel> density;                  /*!< Density kernel (storage, computation, exchange)  */
+  DefaultPointer<NondirectionalPairPotential> potential;  /*!< Expression of the long-range potential           */
+  DefaultPointer<ForceField> mean_field;                  /*!< Forces kernel (storage and computation)          */
+  DefaultPointer<TimeMarching<TM>> time_marching;         /*!< Advection scheme                                 */
+  DefaultPointer<CollisionHandler> collision_handler;     /*!< Collision simulator, majorants storage           */
 
-  DefaultPointer<Sampler> sampler;
-  DefaultPointer<Output> output;
+  DefaultPointer<Sampler> sampler;                        /*!< Sampling of macroscopic quantities (parallel)    */
+  DefaultPointer<Output> output;                          /*!< Output functionalities                           */
 
-  CorrelationFun correlation;
+  CorrelationFun correlation;                             /*!< Expression the short-range correlation function  */
 
-  Stopwatch<DefaultWatchPrecision> stopwatch;
+  Stopwatch<DefaultWatchPrecision> stopwatch;             /*!< Partial CPU times counter                        */
 
-  int n_iter_thermo = DEFAULT_ITER_THERMO;
-  int n_iter_sample = DEFAULT_ITER_SAMPLE;
-  bool mean_field_gg;
+  int n_iter_thermo = DEFAULT_ITER_THERMO;                  /*!< Number of thermostat iterations (stored locally)   */
+  int n_iter_sample = DEFAULT_ITER_SAMPLE;                  /*!< Number of sampling iterations (  "  "  )           */
+  bool mean_field_gg;                                       /*!< Perform mean-field computation (yes = 1, no = 0)   */
 
-  std::map < int, std::vector<int> > stored_elapsed_times;
+  std::map < int, std::vector<int> > stored_elapsed_times;  /*!< Cumulative elapsed times (see #define tags above)  */
 
 public:
 
   DSMC(const DefaultString&);
   ~DSMC() = default;
 
-  // Getters
+  // GETTERS
   inline DefaultPointer<ParallelEnvironment>& get_par_env() { return par_env; }
   inline DefaultPointer<IOHandler>& get_io_hand() { return io_hand; }
   inline DefaultPointer<ConfigurationReader>& get_conf() { return conf; }
@@ -132,7 +169,7 @@ public:
 
   inline CorrelationFun& get_correlation() { return correlation; }
 
-  // Testing
+  // TESTING FEATURES
   void test_density(void);
   void test_force_field(void);
   void test_time_marching(void);
@@ -142,12 +179,12 @@ public:
   void test_output(void);
   void test_loop(int);
 
-  // Initialize
+  // INITIALIZATION AND DSMC LOOP
   void initialize_simulation(void);
-  void dsmc_iteration(void);
-  void dsmc_loop(void);
+  void dsmc_iteration(void);  /* UNUSED */
+  void dsmc_loop(void);       /* UNUSED */
 
-  // Output
+  // OUTPUT FEATURES
   void output_all_samples(void);
   void output_all_samples(real_number);
   void output_collision_statistics(void);
