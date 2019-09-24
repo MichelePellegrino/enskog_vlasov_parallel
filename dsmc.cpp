@@ -1,4 +1,4 @@
-/*! \file configuration.cpp
+/*! \file dsmc.cpp
  *  \brief Source code for DSMC class
  */
 
