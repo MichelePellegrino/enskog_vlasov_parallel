@@ -1,3 +1,14 @@
+/*! \file advection.hpp
+ *  \brief Header containing the classes for ensemble advection
+ *
+ *  Static-time polimorphism allows the definition of multiple advection schemes
+ *  via template specialization.
+ */
+
+// NB:  no other time marching techniques have been defined apart from the
+//      standard one; it would be better to refactor this class hierarchy.
+
+
 #ifndef EV_ADVECTION_HPP
 #define EV_ADVECTION_HPP
 
@@ -8,6 +19,10 @@
 #include "grid.hpp"
 #include "species.hpp"
 
+
+/*! \class AbstractTimeMarching
+ *  \brief Class containing all data needed by any advection scheme
+ */
 class AbstractTimeMarching : protected Motherbase
 {
 protected:
@@ -33,6 +48,13 @@ public:
   virtual void update_ensemble() = 0;
 };
 
+
+/*! \class TimeMarching
+ *  \brief Base for advection classes hierarchy
+ *
+ *  This template class needs to be specialized in order to produce a valid time
+ *  -marching scheme.
+ */
 template <MarchingType dummy_advection_type>
 class TimeMarching : public AbstractTimeMarching
 {
@@ -45,6 +67,13 @@ public:
   ~TimeMarching() = default;
 };
 
+
+/*! \class TimeMarching<Standard>
+ *  \brief Standard advection scheme
+ *
+ *  This is the standard explicit foreard advection scheme adopted by standard
+ *  DSMC simulations.
+ */
 template <>
 class TimeMarching<Standard> : public AbstractTimeMarching
 {
@@ -76,6 +105,9 @@ public:
       ensemble->data()[i].xp += ensemble->data()[i].vx * delta_t + 0.5 * ax * delta_t * delta_t;
       ensemble->data()[i].yp += ensemble->data()[i].vy * delta_t + 0.5 * ay * delta_t * delta_t;
       /* PERIODIC BOUNDARY CONDITIONS ... */
+      // In the following it is tested whether a particle go through the domain
+      // more than 10 times (the number is arbitrary; it is just a rough test to
+      // ensure velocities do not 'explode').
       while ( ensemble->data()[i].xp >= xmax )
       {
         counter_out_of_bound++;
@@ -112,6 +144,10 @@ public:
       ensemble->add_to_inc_matrix(i);
     }
     par_env->barrier();
+    /*!
+    *   Particles need to be exchanged between processes AFTER advection (this
+    *   is one advantage of the replicated grid approach).
+    */
     if ( par_env->is_root() )
       std::cout << " >> exchanging particles..." << std::endl;
     ensemble->exchange_particles();
