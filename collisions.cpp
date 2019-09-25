@@ -1,3 +1,7 @@
+/*! \file collisions.cpp
+ *  \brief Source code for the class implementing collisions simulation
+ */
+
 #include "collisions.hpp"
 #include "parallel_environment.hpp"
 #include "topology.hpp"
@@ -324,6 +328,7 @@ CollisionHandler::perform_collisions
               {
                 n_real++;
                 delta = scaled_k*scalar_prod*species->get_diam_fluid();
+                // delta = rel_vel*scalar_prod;
                 ensemble->get_vx(idx_p1) += delta[0];
                 ensemble->get_vy(idx_p1) += delta[1];
                 ensemble->get_vz(idx_p1) += delta[2];
@@ -498,7 +503,10 @@ CollisionHandler::perform_parallel_collisions
         fk = scalar_prod * aa / ( a11(i_cell1, j_cell1) * vrmax11(i_cell1, j_cell1) );
         perform_collision_send[rs].push_back(
           (scalar_prod > 0) * (numdens_process_map_recv[rs][i] > 0) * (rng->sample_uniform() < fk) );
+        // This one seems suspicious ...
+        // # # # # #
         delta = scaled_k_process_map[rs][i]*scalar_prod*species->get_diam_fluid();
+        // # # # # #
         delta_process_map_send[rs].emplace_back(delta[0], delta[1], delta[2]);
         if ( perform_collision_send[rs][i] )
         {
