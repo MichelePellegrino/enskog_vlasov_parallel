@@ -1,14 +1,31 @@
+/*! \file correlations.hpp
+ *  \brief Header containing definitions for possible correlation functions
+ *
+ *  Correlation functions are implemented as functors; no parameter is needed for
+ *  initialization
+ */
+
 #ifndef EV_CORRELATIONS_HPP
 #define EV_CORRELATIONS_HPP
 
 #include "types.hpp"
 #include "utility.hpp"
+
+// cmath is actually redundant
 #include <cmath>
 
 namespace ev_correlations {
 
+/*! \enum CorrelationType
+    \brief Enumeration of possible expressions for the correlation function
+
+    Values within this enumeraion are used as template argument for template classes
+*/
 enum CorrelationType { CarnahanStarling, Vera };
 
+/*! \class CorrelationFunction
+ *  \brief Prototype template function for custom correlation functions
+ */
 template<CorrelationType dummy_type>
 class CorrelationFunction
 {
@@ -16,9 +33,12 @@ class CorrelationFunction
 };
 
 
-// Specifications:
+/* SPECIFICATIONS */
 
-// Carnahan-Starling, 1969
+// CARNAHAN-STARLING, 1969
+/*! \class CorrelationFunction<CarnahanStarling>
+ *  \brief Carnahan-Starling expression
+ */
 template<>
 class CorrelationFunction<CarnahanStarling>
 {
@@ -29,7 +49,11 @@ public:
   }
 };
 
-// Vera, 1997
+
+// VERA, 1997
+/*! \class CorrelationFunction<Vera>
+ *  \brief Vera expression
+ */
 template<>
 class CorrelationFunction<Vera>
 {
