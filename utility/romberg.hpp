@@ -1,24 +1,33 @@
+/*! \file romberg.hpp
+ *  \brief Header containing classes and routines for Romberg quadrature rule
+ *
+ *  The code is taken from Numerical Recipes: The Art of Scientific Computing
+ *  (III edition) with very few modifications.
+ */
+
 #ifndef ROMBERG_HPP
 #define ROMBERG_HPP
 
+/*
+  Names are taken directly from Numerical Recipes; using #define in this context
+  allow to share this macro between classes/procedures (so, it is more handy than
+  a typedef, even if less elegant).
+*/
 #include <vector>
-
 #define Doub double
 #define Int int
 #define VecDoub std::vector<double>
 #define Bool bool
-
 #define MIN std::min
 #define MAX std::max
 
+// Static numerical parameters (values taken from N.R.)
 #ifndef ITERMAX
 #define ITERMAX 20
 #endif
-
 #ifndef MULT_STEP
 #define MULT_STEP (1.0/9.0)
 #endif
-
 #ifndef ORDER_K
 #define ORDER_K 5
 #endif
@@ -176,13 +185,15 @@ struct Quadrature
 template <class T>
 struct Midpnt : Quadrature
 {
-  //Routine implementing the extended midpoint rule.
-  Doub a,b,s;   // Limits of integration and current value of inte-
-  T &funk;      // gral.
+  // Routine implementing the extended midpoint rule.
+  Doub a,b,s;   // Limits of integration and current value of integral.
+  T &funk;
   Midpnt(T &funcc, const Doub aa, const Doub bb) :
     funk(funcc), a(aa), b(bb) { n=0; }
-  // The constructor takes as inputs func, the function or functor to be integrated between
-  // limits a and b, also input.
+  /*
+    The constructor takes as inputs func, the function or functor to be
+    integrated between limits a and b, also input.
+  */
   Doub next()
   {
   Int it,j;
@@ -211,8 +222,8 @@ struct Midpnt : Quadrature
       return s;
     }
   }
-  // The added points alternate in spacing be- tween del and ddel.
-  // The new sum is combined with the old inte- gral to give a refined integral.
+  // The added points alternate in spacing between del and ddel.
+  // The new sum is combined with the old integral to give a refined integral.
   virtual Doub func(const Doub x)
   {
     return funk(x);
@@ -222,12 +233,14 @@ struct Midpnt : Quadrature
 template <class T>
 struct Midinf : Midpnt<T>
 {
-  // This routine is an exact replacement for midpnt, i.e., returns the nth stage
-  // of refinement of the integral of funcc from aa to bb, except that the
-  // function is evaluated at evenly spaced points in 1=x rather than in x. This
-  // allows the upper limit bb to be as large and positive as the computer allows,
-  // or the lower limit aa to be as large and negative, but not both. aa and bb
-  // must have the same sign.
+  /*
+    This routine is an exact replacement for midpnt, i.e., returns the nth stage
+    of refinement of the integral of funcc from aa to bb, except that the
+    function is evaluated at evenly spaced points in 1=x rather than in x. This
+    allows the upper limit bb to be as large and positive as the computer allows,
+    or the lower limit aa to be as large and negative, but not both. aa and bb
+    must have the same sign.
+  */
   Doub func(const Doub x)
   {
     return Midpnt<T>::funk(1.0/x)/(x*x);
